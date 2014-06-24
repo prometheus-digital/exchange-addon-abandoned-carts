@@ -187,6 +187,7 @@ function it_exchange_abandoned_carts_process_qualified_shoppers_queue() {
 		}
 	}
 }
+add_action( 'wp_footer', 'it_exchange_abandoned_carts_process_qualified_shoppers_queue' );
 
 /**
  * Grabs the active abandoned cart for a customer or returns false if there isn't one.
@@ -197,8 +198,13 @@ function it_exchange_abandoned_carts_process_qualified_shoppers_queue() {
  * @return object the abandoned cart object
 */
 function it_exchange_get_active_abandoned_cart_for_user( $customer_id ) {
+
+	/**
+	 * @todo THIS IS TEMP FOR TESTING. DELETE BEFORE RELEASE
+	*/
 	if ( ! $customer = it_exchange_get_customer( $customer_id ) )
 		return false;
+	// END TEMP
 
 	$args = array(
 		'customer'    => $customer_id,
@@ -352,4 +358,4 @@ function debug_abandoned_carts() {
 	ITUtility::print_r($plugin_options);
 
 }
-add_action( 'wp_footer', 'it_exchange_abandoned_carts_process_qualified_shoppers_queue' );
+//add_action( 'wp_footer', 'debug_abandoned_cats' );
