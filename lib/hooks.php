@@ -32,6 +32,7 @@ function it_exchange_abandoned_carts_register_scripts( $hook ) {
 	if ( ! empty( $screen->id ) && 'edit-it_ex_abandoned' == $screen->id ) {
 		// ChartJS
 		wp_enqueue_script( 'ithemes-chartjs' );
+		wp_enqueue_style( 'it-exchange-abandoned-carts-admin', ITUtility::get_url_from_file( dirname( __FILE__ ) ) . '/css/admin.css' );
 	}
 
 }
@@ -46,54 +47,81 @@ add_action( 'admin_print_scripts', 'it_exchange_abandoned_carts_register_scripts
 */
 function it_exchange_abdandoned_carts_insert_custom_dashboard( $incoming_from_wp_filter ) {
 	?>
-	<style type="text/css">
-		.it-exchange-abandoned-carts-dashboard .abandoned-carts-overview { background:#fff;padding:20px; }
-		.it-exchange-abandoned-carts-dashboard .abandoned-carts-overview h3 { margin-top:0; }
-		.it-exchange-abandoned-carts-dashboard .abandoned-carts-overview .overview-item { width:20%; padding:5px; margin:5px; float:left;text-align:center; }
-		.it-exchange-abandoned-carts-dashboard .abandoned-carts-overview .overview-item .overview-item-value { font-weight:bold;font-size:1.2em; }
-	</style>
 	<script type="text/javascript">
 		jQuery( document ).ready(function( $ ) {
-			//Get context with jQuery - using jQuery's .get() method.
-			var itExchangeAbandonedCartOverviewCTX = $("#it-exchange-abandoned-cart-overview-chart").get(0).getContext("2d");
-			//This will get the first returned node in the jQuery collection.
+
 			var exampleData = {
 				labels: ["2014-06-23","2014-06-24","2014-06-25","2014-06-26","2014-06-27","2014-06-28","2014-06-29"],
 				datasets: [
 					{
-						fillColor : "rgba(151,187,205,0.5)",
-						strokeColor : "rgba(151,187,205,1)",
-						pointColor : "rgba(151,187,205,1)",
+						fillColor : "#d1ebb0",
+						strokeColor : "#89c43d",
+						pointColor : "#89c43d",
 						pointStrokeColor : "#fff",
 						data : [28,48,40,19,96,27,100]
 					}
 				]
 			};
-			var itExchangeAbandonedCartOverview = new Chart(itExchangeAbandonedCartOverviewCTX).Line(exampleData);
+
+			// Run function to build the initial chart
+			itExchangeAbandonedCartSetupChart(exampleData);
+
+			// Run setup function again on window resize since there is no native redraw method
+			jQuery(window).resize( function() {
+				itExchangeAbandonedCartSetupChart(exampleData);
+			});
+
 		});
+
+		function itExchangeAbandonedCartSetupChart(exampleData) {
+			// Get width of canvas parent
+			var itExchangeAbandonedCartCanvas = jQuery("#it-exchange-abandoned-cart-overview-chart");
+			var itExchangeAbandonedCartChartWidth = itExchangeAbandonedCartCanvas.parent().width();
+
+			// Set width attr to canvas element
+			itExchangeAbandonedCartCanvas.attr({
+				width: itExchangeAbandonedCartChartWidth,
+				height: 250
+			});
+
+			// Set chart options
+			var options = {
+				scaleFontFamily : "'Open Sans'",
+				scaleFontStyle : "bold",
+				scaleFontSize : 14,
+				scaleLineColor : "#999",
+				scaleGridLineWidth : 2
+			}
+
+			// Draw the chart
+			var itExchangeAbandonedCartOverviewCTX = itExchangeAbandonedCartCanvas.get(0).getContext("2d");
+			var itExchangeAbandonedCartOverview = new Chart(itExchangeAbandonedCartOverviewCTX).Line(exampleData, options);
+		}
+
 	</script>
 	<div class="it-exchange-abandoned-carts-dashboard">
 		<div class="abandoned-carts-overview">
-			<h3><?php _e( 'Overview', 'LION' ); ?></h3>
-			<div class="overview-item overview-item-recovered-carts">
-				<div class="overview-item-value">27</div>
-				<div class="overview-item-title">Recovered Carts</div>
-			</div>
-			<div class="overview-item overview-item-recovered-revenue">
-				<div class="overview-item-value">$4,360.20</div>
-				<div class="overview-item-title">Recovered Revenue</div>
-			</div>
-			<div class="overview-item overview-item-conversion">
-				<div class="overview-item-value">15%</div>
-				<div class="overview-item-title">Recovered Revenue</div>
-			</div>
-			<div class="overview-item overview-item-average-value">
-				<div class="overview-item-value">$161.48</div>
-				<div class="overview-item-title">Average Recovered Value</div>
+			<div class="abandoned-carts-overview-items">
+				<div class="overview-item overview-item-recovered-carts">
+					<div class="overview-item-value">27</div>
+					<div class="overview-item-title">Recovered Carts</div>
+				</div>
+				<div class="overview-item overview-item-recovered-revenue">
+					<div class="overview-item-value">$4,360.20</div>
+					<div class="overview-item-title">Recovered Revenue</div>
+				</div>
+				<div class="overview-item overview-item-conversion">
+					<div class="overview-item-value">15%</div>
+					<div class="overview-item-title">Recovered Revenue</div>
+				</div>
+				<div class="overview-item overview-item-average-value">
+					<div class="overview-item-value">$161.48</div>
+					<div class="overview-item-title">Average Recovered Value</div>
+				</div>
 			</div>
 			<div class="overview-chart clear">
 				<h3><?php _e( 'Recovered Carts', 'LION' ); ?></h3>
-				<canvas id="it-exchange-abandoned-cart-overview-chart" width="900" height="200"></canvas>
+				<canvas id="it-exchange-abandoned-cart-overview-chart"></canvas>
 			</div>
 		</div>
 		<div class="abdandoned-carts-nav">
