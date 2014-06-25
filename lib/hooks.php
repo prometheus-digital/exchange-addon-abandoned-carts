@@ -29,7 +29,7 @@ function it_exchange_abandoned_carts_register_scripts( $hook ) {
 	$screen = get_current_screen();
 
 	// If we're on the screen, enqueue our scripts. It is registered by Exchange in the admin
-	if ( ! empty( $screen->id ) && 'edit-it_ex_abandoned' == $screen->id ) {
+	if ( ! empty( $screen->id ) && ( 'edit-it_ex_abandoned' == $screen->id || 'edit-it_ex_abandond_email' == $screen->id ) ) {
 		// ChartJS
 		wp_enqueue_script( 'ithemes-chartjs' );
 		wp_enqueue_style( 'it-exchange-abandoned-carts-admin', ITUtility::get_url_from_file( dirname( __FILE__ ) ) . '/css/admin.css' );
@@ -46,6 +46,11 @@ add_action( 'admin_print_scripts', 'it_exchange_abandoned_carts_register_scripts
  * @return object
 */
 function it_exchange_abdandoned_carts_insert_custom_dashboard( $incoming_from_wp_filter ) {
+	$current_tab = 'carts';
+	if ( ! empty( $_GET['post_type'] ) && 'it_ex_abandond_email' == $_GET['post_type'] )
+		$current_tab = 'emails';
+	if ( ! empty( $_GET['page'] ) && 'it-exexchange-abandoned-cart-settings' == $_GET['page'] )
+		$current_tab = 'settings';
 	?>
 	<script type="text/javascript">
 		jQuery( document ).ready(function( $ ) {
@@ -126,9 +131,9 @@ function it_exchange_abdandoned_carts_insert_custom_dashboard( $incoming_from_wp
 		</div>
 		<div class="abdandoned-carts-nav">
 			<h3 class="nav-tab-wrapper">
-			<a class="nav-tab nav-tab-active" href="<?php echo admin_url( 'edit.php?post_type=it_ex_abandoned' ); ?>"><?php _e( 'Carts', 'LION' ); ?></a>
-			<a class="nav-tab" href="<?php echo admin_url( 'edit.php?post_type=it_ex_abandond_email' ); ?>"><?php _e( 'Emails', 'LION' ); ?></a>
-			<a class="nav-tab" href="<?php echo admin_url( 'admin.php?page=it-exchange-abandoned-email-settings' ); ?>"><?php _e( 'Settings', 'LION' ); ?></a>
+			<a class="nav-tab <?php echo ($current_tab == 'carts' ) ? 'nav-tab-active' : '';?>" href="<?php echo admin_url( 'edit.php?post_type=it_ex_abandoned' ); ?>"><?php _e( 'Carts', 'LION' ); ?></a>
+			<a class="nav-tab <?php echo ($current_tab == 'emails' ) ? 'nav-tab-active' : '';?>" href="<?php echo admin_url( 'edit.php?post_type=it_ex_abandond_email' ); ?>"><?php _e( 'Email Templates', 'LION' ); ?></a>
+			<a class="nav-tab <?php echo ($current_tab == 'settings' ) ? 'nav-tab-active' : '';?>" href="<?php echo admin_url( 'admin.php?page=it-exchange-abandoned-email-settings' ); ?>"><?php _e( 'Settings', 'LION' ); ?></a>
 			</h3>
 		</div>
 
@@ -137,3 +142,4 @@ function it_exchange_abdandoned_carts_insert_custom_dashboard( $incoming_from_wp
 	return $incoming_from_wp_filter;
 }
 add_filter( 'views_edit-it_ex_abandoned', 'it_exchange_abdandoned_carts_insert_custom_dashboard' );
+add_filter( 'views_edit-it_ex_abandond_email', 'it_exchange_abdandoned_carts_insert_custom_dashboard' );
