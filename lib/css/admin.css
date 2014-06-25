@@ -6,6 +6,10 @@
 .it-exchange-abandoned-carts-dashboard .abandoned-carts-overview-items .overview-item .overview-item-value { font-weight:bold;font-size:2em;line-height:1.4em; }
 .it-exchange-abandoned-carts-dashboard .abandoned-carts-overview .overview-chart {width: 100%; margin-top: 2em;}
 
+/** -----------------------------------------------------:[ abadoned cart wp table class ]: --------------*/
+.tablenav.top .bulkactions { display:none; }
+
+/** -----------------------------------------------------:[ abadoned cart media queries ]: --------------*/
 @media screen and (max-width: 850px) {
 	.it-exchange-abandoned-carts-dashboard .abandoned-carts-overview-items .overview-item { width: 50%;}
 } 

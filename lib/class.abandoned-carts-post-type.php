@@ -34,6 +34,7 @@ class IT_Exchange_Abandoned_Cart_Post_Type {
 			add_filter( 'it_exchange_abandoned_cart_metabox_callback', array( $this, 'register_abandoned_cart_details_admin_metabox' ) );
 			add_filter( 'screen_layout_columns', array( $this, 'modify_details_page_layout' ) );
 			add_filter( 'get_user_option_screen_layout_it_ex_abandoned', array( $this, 'update_user_column_options' ) );
+			add_filter( 'bulk_actions-edit-it_ex_abandoned', '__return_empty_array' );
 		}
 	}
 
@@ -167,11 +168,9 @@ class IT_Exchange_Abandoned_Cart_Post_Type {
 	*/
 	function modify_all_abandoned_carts_table_columns( $existing ) {
 
-		// Remove Checkbox - adding it back below
-		if ( isset( $existing['cb'] ) ) {
-			$check = $existing['cb'];
+		// Remove Checkbox
+		if ( isset( $existing['cb'] ) )
 			unset( $existing['cb'] );
-		}
 
 		// Remove Title - adding it back below
 		if ( isset( $existing['title'] ) )
@@ -200,7 +199,6 @@ class IT_Exchange_Abandoned_Cart_Post_Type {
 
 		// All Core should be removed at this point. Build ours back (including date from core)
 		$exchange_columns = array(
-			'cb'                                            => $check,
 			'date'                                          => __( 'Date', 'LION' ),
 			'it_exchange_abandoned_cart_customer_column'    => __( 'Customer', 'LION' ),
 			'it_exchange_abandoned_cart_status_column'      => __( 'Cart Status', 'LION' ),
