@@ -27,13 +27,10 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		add_action( 'save_post_it_ex_abandond_email', array( $this, 'save_abandoned_cart_email' ) );
 
 		if ( is_admin() ) {
-			add_action( 'admin_menu', array( $this, 'add_submenu_to_exchange' ) );
-			add_filter( 'manage_edit-it_ex_abandond_email_columns', array( $this, 'modify_all_abandoned_carts_table_columns' ) );
-			add_filter( 'manage_edit-it_ex_abandond_email_sortable_columns', array( $this, 'make_abandoned_cart_custom_columns_sortable' ) );
-			add_filter( 'manage_it_ex_abandond_email_posts_custom_column', array( $this, 'add_abandoned_cart_method_info_to_view_all_table_rows' ) );
-			add_filter( 'it_exchange_abandoned_cart_metabox_callback', array( $this, 'register_abandoned_cart_details_admin_metabox' ) );
-			add_filter( 'screen_layout_columns', array( $this, 'modify_details_page_layout' ) );
-			add_filter( 'get_user_option_screen_layout_it_ex_abandond_email', array( $this, 'update_user_column_options' ) );
+			add_filter( 'manage_edit-it_ex_abandond_email_columns', array( $this, 'modify_all_abandoned_cart_emails_table_columns' ) );
+			add_filter( 'manage_edit-it_ex_abandond_email_sortable_columns', array( $this, 'make_abandoned_cart_email_custom_columns_sortable' ) );
+			add_filter( 'manage_it_ex_abandond_email_posts_custom_column', array( $this, 'add_abandoned_cart_email_info_to_view_all_table_rows' ) );
+			add_filter( 'it_exchange_abandoned_cart_email_metabox_callback', array( $this, 'register_abandoned_cart_email_details_admin_metabox' ) );
 		}
 	}
 
@@ -67,41 +64,6 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	}
 
 	/**
-	 * Adds the submenu item to exchagne menu
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return void
-	*/
-	function add_submenu_to_exchange() {
-		add_submenu_page( 'it-exchange', __( 'Abandoned Carts', 'LION' ), __( 'Abandoned Carts', 'LION' ), $this->admin_menu_capability, 'edit.php?post_type=it_ex_abandond_email' );
-	}
-
-	/**
-	 * Set the max columns option for the add / edit product page.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param $columns Existing array of how many colunns to show for a post type
-	 * @return array Filtered array
-	*/
-	function modify_details_page_layout( $columns ) {
-		$columns['it_ex_abandond_email'] = 1;
-		return $columns;
-	}
-
-	/**
-	 * Updates the user options for number of columns to use on abandoned_cart details page
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return 2
-	*/
-	function update_user_column_options( $existing ) {
-		return 1;
-	}
-
-	/**
 	 * Actually registers the post type
 	 *
 	 * @since 1.0.0
@@ -119,10 +81,10 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	 * @return void
 	*/
 	function meta_box_callback( $post ) {
-		$abandoned_cart = it_exchange_get_abandoned_cart( $post );
+		$abandoned_cart_email = it_exchange_get_abandoned_cart( $post );
 
 		// Do action for any product type
-		do_action( 'it_exchange_abandoned_cart_metabox_callback', $abandoned_cart );
+		do_action( 'it_exchange_abandoned_cart_email_metabox_callback', $abandoned_cart_email );
 	}
 
 	/**
@@ -131,8 +93,8 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	 * This method is hooked to save_post. It provides hooks for add-on developers
 	 * that will only be called when the post being saved is an iThemes Exchange abandoned_cart.
 	 * It provides the following 4 hooks:
-	 * - it_exchange_save_abandoned_cart_unvalidated                    // Runs every time an iThemes Exchange abandoned_cart is saved.
-	 * - it_exchange_save_abandoned_cart                                // Runs every time an iThemes Exchange abandoned_cart is saved if not an autosave and if user has permission to save post
+	 * - it_exchange_save_abandoned_cart_email_unvalidated // Runs every time an iThemes Exchange abandoned_cart is saved.
+	 * - it_exchange_save_abandoned_cart_email             // Runs every time an iThemes Exchange abandoned_cart is saved if not an autosave and if user has permission to save post
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -144,7 +106,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 			return;
 
 		// These hooks fire off any time a it_ex_abandond_email post is saved w/o validations
-		do_action( 'it_exchange_save_abandoned_cart_unvalidated', $post );
+		do_action( 'it_exchange_save_abandoned_cart_email_unvalidated', $post );
 
 		// Fire off actions with validations that most instances need to use.
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
@@ -154,7 +116,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 			return;
 
 		// This is called any time save_post hook
-		do_action( 'it_exchange_save_abandoned_cart', $post );
+		do_action( 'it_exchange_save_abandoned_cart_email', $post );
 	}
 
 	/**
@@ -164,7 +126,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	 * @param array $existing  exisiting columns array
 	 * @return array  modified columns array
 	*/
-	function modify_all_abandoned_carts_table_columns( $existing ) {
+	function modify_all_abandoned_cart_emails_table_columns( $existing ) {
 
 		// Remove Checkbox - adding it back below
 		if ( isset( $existing['cb'] ) ) {
@@ -199,12 +161,14 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 
 		// All Core should be removed at this point. Build ours back (including date from core)
 		$exchange_columns = array(
-			'cb'                                            => $check,
-			'date'                                          => __( 'Date', 'LION' ),
-			'it_exchange_abandoned_cart_customer_column'    => __( 'Customer', 'LION' ),
-			'it_exchange_abandoned_cart_status_column'      => __( 'Cart Status', 'LION' ),
-			'it_exchange_abandoned_cart_emails_sent_column' => __( 'Emails Sent', 'LION' ),
-			'it_exchange_abandoned_cart_total_column'       => __( 'Cart Value', 'LION' ),
+			'cb'                                                   => $check,
+			'it_exchange_abandoned_cart_email_status_column'       => __( 'Status', 'LION' ),
+			'it_exchange_abandoned_cart_email_subject_column'      => __( 'Subject', 'LION' ),
+			'it_exchange_abandoned_cart_email_scheduling_column'   => __( 'Scheduling', 'LION' ),
+			'it_exchange_abandoned_cart_email_delivered_column'    => __( 'Emails Sent', 'LION' ),
+			'it_exchange_abandoned_cart_email_opened_column'       => __( 'Opened Rate', 'LION' ),
+			'it_exchange_abandoned_cart_email_clickthrough_column' => __( 'Clickthrough Rate', 'LION' ),
+			'it_exchange_abandoned_cart_email_recovered_column'    => __( 'Recovered Rate', 'LION' ),
 		);
 
 		// Merge ours back with existing to preserve any 3rd party columns
@@ -219,10 +183,9 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	 * @param array $sortables  existing sortable columns
 	 * @return array  modified sortable columnns
 	*/
-	function make_abandoned_cart_custom_columns_sortable( $sortables ) {
-		$sortables['it_exchange_abandoned_cart_status_column']   = 'it_exchange_abandoned_cart_status_column';
-		$sortables['it_exchange_abandoned_cart_customer_column'] = 'it_exchange_abandoned_cart_customer_column';
-		$sortables['it_exchange_abandoned_cart_total_column']    = 'it_exchange_abandoned_cart_total_column';
+	function make_abandoned_cart_email_custom_columns_sortable( $sortables ) {
+		$sortables['it_exchange_abandoned_cart_email_status_column']   = 'it_exchange_abandoned_cart_email_status';
+		$sortables['it_exchange_abandoned_cart_email_scheduling_column'] = 'it_exchange_abandoned_cart_email_scheduling';
 		return $sortables;
 	}
 
@@ -234,36 +197,31 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	 * @param integer $post  post ID
 	 * @return void
 	*/
-	function add_abandoned_cart_method_info_to_view_all_table_rows( $column ) {
+	function add_abandoned_cart_email_info_to_view_all_table_rows( $column ) {
 		global $post;
-		$abandoned_cart = it_exchange_get_abandoned_cart( $post );
-		$emails         = it_exchange_abandoned_carts_get_abandonment_emails();
 
 		switch( $column ) {
-			case 'it_exchange_abandoned_cart_status_column' :
-				esc_attr_e( it_exchange_get_abanonded_cart_status_label( $abandoned_cart ) );
+			case 'it_exchange_abandoned_cart_email_status_column' :
+				$post_status = get_post_status_object( $post->post_status );
+				esc_attr_e( empty( $post_status->label ) ? ucwords( $post->post_status ) : $post_status->label );
 				break;
-			case 'it_exchange_abandoned_cart_customer_column' :
-				if ( $customer = it_exchange_get_customer( $abandoned_cart->customer_id ) )
-					esc_attr_e( empty( $customer->wp_user->display_name ) ? $customer->wp_user->user_login : $customer->wp_user->display_name );
-				else
-					esc_attr_e( __( 'Unknown', 'LION' ) );
+			case 'it_exchange_abandoned_cart_email_subject_column' :
+				esc_attr_e( get_the_title( $post->ID ) );
 				break;
-			case 'it_exchange_abandoned_cart_emails_sent_column' :
-				if ( empty( $abandoned_cart->emails_sent ) || ! is_array( $abandoned_cart->emails_sent ) ) {
-					esc_attr_e( __( 'None', 'LION' ) );
-					break;
-				}
-
-				foreach( $abandoned_cart->emails_sent as $email ) {
-					if ( isset( $emails[$email]['title'] ) ) {
-						$emails_sent[] = $emails[$email]['title'];
-					}
-				};
-				echo implode( $emails_sent, '<br />' );
+			case 'it_exchange_abandoned_cart_email_scheduling_column' :
+				echo '30 minutes';
 				break;
-			case 'it_exchange_abandoned_cart_total_column' :
-				esc_attr_e( it_exchange_get_cart_total( true, array( 'use_cached_customer_cart' => $abandoned_cart->customer_id ) ) );
+			case 'it_exchange_abandoned_cart_email_delivered_column' :
+				echo '50';
+				break;
+			case 'it_exchange_abandoned_cart_email_opened_column' :
+				echo '30%';
+				break;
+			case 'it_exchange_abandoned_cart_email_clickthrough_column' :
+				echo '20%';
+				break;
+			case 'it_exchange_abandoned_cart_email_recovered_column' :
+				echo '10%';
 				break;
 		}
 	}
@@ -276,10 +234,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	 * @param object $post post object
 	 * @return void
 	*/
-	function register_abandoned_cart_details_admin_metabox( $post ) {
-		// Remove Publish metabox
-		remove_meta_box( 'submitdiv', 'it_ex_abandond_email', 'side' );
-
+	function register_abandoned_cart_email_details_admin_metabox( $post ) {
 		// Remove Slug metabox
 		remove_meta_box( 'slugdiv', 'it_ex_abandond_email', 'normal' );
 
@@ -287,10 +242,10 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		add_filter('screen_options_show_screen', '__return_false');
 
 		// Cart Details
-		$title     = __( 'Abandoned Cart Details', 'LION' );
-		$callback  = array( $this, 'print_abandoned_cart_details_metabox' );
+		$title     = __( 'Abandoned Cart Email Settings', 'LION' );
+		$callback  = array( $this, 'print_abandoned_cart_email_details_metabox' );
 		$post_type = 'it_ex_abandond_email';
-		add_meta_box( 'it-exchange-abandoned-cart-details', $title, $callback, $post_type, 'normal', 'high' );
+		add_meta_box( 'it-exchange-abandoned-cart-email-details', $title, $callback, $post_type, 'normal', 'high' );
 
 	}
 
@@ -301,7 +256,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	 * @param object $post post object
 	 * @return void
 	*/
-	function print_abandoned_cart_details_metabox( $post ) {
+	function print_abandoned_cart_email_details_metabox( $post ) {
 		do_action( 'it_exchange_before_abandoned_cart_details' );
 		?><p>Here i am</p><?php
 		do_action( 'it_exchange_after_abandoned_cart_details' );
