@@ -41,12 +41,12 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 
 		$this->post_type = 'it_ex_abandond_email';
 		$labels    = array(
-			'name'          => __( 'Abandoned Carts', 'LION' ),
-			'singular_name' => __( 'Abandoned Cart', 'LION' ),
+			'name'          => __( 'Abandoned Cart Email Templates', 'LION' ),
+			'singular_name' => __( 'Abandoned Cart Email Template', 'LION' ),
 		);
 		$this->options = array(
 			'labels'               => $labels,
-			'description'          => __( 'An iThemes Exchange Post Type for storing all Abandoned Carts in the system', 'LION' ),
+			'description'          => __( 'An iThemes Exchange Post Type for storing all Abandoned Cart email templates in the system', 'LION' ),
 			'public'               => false,
 			'show_ui'              => true,
 			'show_in_nav_menus'    => false,
@@ -56,7 +56,6 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 			'supports'             => array(),
 			'capabilities'         => array(
 				'edit_posts'        => 'edit_posts',
-				'create_posts'      => apply_filters( 'it_ex_abandond_email_create_posts_capabilities', 'do_not_allow' ),
 				'edit_others_posts' => 'edit_others_posts',
 				'publish_posts'     => 'publish_posts',
 			),
@@ -308,4 +307,4 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		do_action( 'it_exchange_after_abandoned_cart_details' );
 	}
 }
-$IT_Exchange_Abandoned_Cart_Post_Type = new IT_Exchange_Abandoned_Cart_Post_Email_Type();
+$IT_Exchange_Abandoned_Cart_Email_Post_Type = new IT_Exchange_Abandoned_Cart_Email_Post_Type();
