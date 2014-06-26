@@ -244,11 +244,14 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		add_filter('screen_options_show_screen', '__return_false');
 
 		// Cart Details
-		$title     = __( 'Abandoned Cart Email Settings', 'LION' );
-		$callback  = array( $this, 'print_abandoned_cart_email_details_metabox' );
+		$title     = __( 'Scheduling', 'LION' );
+		$callback  = array( $this, 'print_abandoned_cart_email_scheduling_metabox' );
 		$post_type = 'it_ex_abandond_email';
-		add_meta_box( 'it-exchange-abandoned-cart-email-details', $title, $callback, $post_type, 'normal', 'high' );
+		add_meta_box( 'it-exchange-abandoned-cart-email-scheduling', $title, $callback, $post_type, 'side', 'default' );
 
+		$title     = __( 'Available Shortcodes', 'LION' );
+		$callback  = array( $this, 'print_abandoned_cart_email_shortcodes_metabox' );
+		add_meta_box( 'it-exchange-abandoned-cart-email-shortcodes', $title, $callback, $post_type, 'normal', 'high' );
 	}
 
 	/**
@@ -274,10 +277,38 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	 * @param object $post post object
 	 * @return void
 	*/
-	function print_abandoned_cart_email_details_metabox( $post ) {
-		do_action( 'it_exchange_before_abandoned_cart_details' );
-		?><p>Here i am</p><?php
-		do_action( 'it_exchange_after_abandoned_cart_details' );
+	function print_abandoned_cart_email_scheduling_metabox( $post ) {
+		do_action( 'it_exchange_before_abandoned_cart_scheduling' );
+		?>
+		<p><?php _e( 'How long should we wait to send this email after a customer abandons their cart?', 'LION' ); ?></p>
+		<select>
+		<?php
+		for( $i=1;$i<=30;$i++ ) { 
+			?><option value="<?php echo $i; ?>"><?php echo $i; ?></option><?php
+		}
+		?>
+		</select>
+		<select>
+			<option value="minutes"><?php _e( 'minutes', 'LION' ); ?></option>
+			<option value="hours"><?php _e( 'hours', 'LION' ); ?></option>
+			<option value="days"><?php _e( 'days', 'LION' ); ?></option>
+			<option value="weeks"><?php _e( 'weeks', 'LION' ); ?></option>
+		</select>
+		<?php
+	}
+
+	/**
+	 * Prints the abandoned cart shortcodes metabox
+	 *
+	 * @since 1.0.0
+	 * @param object $post post object
+	 * @return void
+	*/
+	function print_abandoned_cart_email_shortcodes_metabox( $post ) {
+		do_action( 'it_exchange_before_abandoned_cart_shortcodes' );
+		?>
+		<p>Shortcode Reference goes here!!</p>
+		<?php
 	}
 }
 $IT_Exchange_Abandoned_Cart_Email_Post_Type = new IT_Exchange_Abandoned_Cart_Email_Post_Type();

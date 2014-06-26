@@ -85,6 +85,18 @@ function it_exchange_abandoned_carts_print_dashboard_page() {
 			<h3><?php _e( 'Recovered Carts', 'LION' ); ?></h3>
 			<canvas id="it-exchange-abandoned-cart-overview-chart"></canvas>
 		</div>
+		<div class="overview-chart">
+			<h3><?php _e( 'Recovered Carts', 'LION' ); ?></h3>
+			<canvas id="it-exchange-abandoned-cart-overview-chart"></canvas>
+		</div>
+		<div class="overview-chart">
+			<h3><?php _e( 'Recovered Carts', 'LION' ); ?></h3>
+			<canvas id="it-exchange-abandoned-cart-overview-chart"></canvas>
+		</div>
+		<div class="overview-chart">
+			<h3><?php _e( 'Recovered Carts', 'LION' ); ?></h3>
+			<canvas id="it-exchange-abandoned-cart-overview-chart"></canvas>
+		</div>
 	</div>
 	<?php
 }
