@@ -4,11 +4,6 @@
 */
 
 /**
- * Settings
-*/
-include( dirname( __FILE__ ) . '/lib/settings.php' );
-
-/**
  * Hooks
 */
 include( dirname( __FILE__ ) . '/lib/hooks.php' );

@@ -27,7 +27,6 @@ class IT_Exchange_Abandoned_Cart_Post_Type {
 		add_action( 'save_post_it_ex_abandoned', array( $this, 'save_abandoned_cart' ) );
 
 		if ( is_admin() ) {
-			add_action( 'admin_menu', array( $this, 'add_submenu_to_exchange' ) );
 			add_filter( 'manage_edit-it_ex_abandoned_columns', array( $this, 'modify_all_abandoned_carts_table_columns' ) );
 			add_filter( 'manage_edit-it_ex_abandoned_sortable_columns', array( $this, 'make_abandoned_cart_custom_columns_sortable' ) );
 			add_filter( 'manage_it_ex_abandoned_posts_custom_column', array( $this, 'add_abandoned_cart_method_info_to_view_all_table_rows' ) );
@@ -66,17 +65,6 @@ class IT_Exchange_Abandoned_Cart_Post_Type {
 		);
 
 		add_action( 'init', array( $this, 'register_the_post_type' ) );
-	}
-
-	/**
-	 * Adds the submenu item to exchagne menu
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return void
-	*/
-	function add_submenu_to_exchange() {
-		add_submenu_page( 'it-exchange', __( 'Abandoned Carts', 'LION' ), __( 'Abandoned Carts', 'LION' ), $this->admin_menu_capability, 'edit.php?post_type=it_ex_abandoned' );
 	}
 
 	/**
