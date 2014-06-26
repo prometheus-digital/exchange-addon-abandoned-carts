@@ -31,6 +31,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 			add_filter( 'manage_edit-it_ex_abandond_email_sortable_columns', array( $this, 'make_abandoned_cart_email_custom_columns_sortable' ) );
 			add_filter( 'manage_it_ex_abandond_email_posts_custom_column', array( $this, 'add_abandoned_cart_email_info_to_view_all_table_rows' ) );
 			add_filter( 'it_exchange_abandoned_cart_email_metabox_callback', array( $this, 'register_abandoned_cart_email_details_admin_metabox' ) );
+			add_filter( 'enter_title_here', array( $this, 'modify_title_placeholder' ), 10, 2 );
 		}
 	}
 
@@ -40,6 +41,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		$labels    = array(
 			'name'          => __( 'Abandoned Cart Email Templates', 'LION' ),
 			'singular_name' => __( 'Abandoned Cart Email Template', 'LION' ),
+			'add_new_item'  => __( 'Add New Email Template', 'LION' ),
 		);
 		$this->options = array(
 			'labels'               => $labels,
@@ -247,6 +249,22 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		$post_type = 'it_ex_abandond_email';
 		add_meta_box( 'it-exchange-abandoned-cart-email-details', $title, $callback, $post_type, 'normal', 'high' );
 
+	}
+
+	/**
+	 * Modifies the title place holder on the edit page
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $placeholder incoming placeholder from WP
+	 * @param object $post the wp post
+	 * @return string
+	*/
+	function modify_title_placeholder( $placeholder, $post ) {
+		if (  'it_ex_abandond_email' == get_post_type( $post ) )
+			$placeholder = __( 'Enter subject here', 'LION' );
+
+		return $placeholder;
 	}
 
 	/**
