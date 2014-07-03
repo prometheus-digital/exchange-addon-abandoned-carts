@@ -32,6 +32,16 @@ function it_exchange_get_abandoned_carts( $args=array() ) {
         unset( $args['cart_status'] ); //remove this so it doesn't conflict with the meta query
     }
 
+	// Add cart_id to meta_query if not empty
+    if ( ! empty( $args['cart_id'] ) ) { 
+        $meta_query = array(
+            'key'   => '_it_exchange_abandoned_cart_cart_id',
+            'value' => $args['cart_id'],
+        );  
+        $args['meta_query'][] = $meta_query;
+        unset( $args['cart_id'] ); //remove this so it doesn't conflict with the meta query
+    }
+
 	// Add customer if not empty
     if ( ! empty( $args['customer'] ) ) { 
         $meta_query = array(
@@ -62,8 +72,13 @@ function it_exchange_get_abandoned_carts( $args=array() ) {
 */
 function it_exchange_get_abandoned_cart( $post ) {
     $abandoned_cart = new IT_Exchange_Abandoned_Cart( $post );
-    if ( $abandoned_cart->ID )
+    if ( $abandoned_cart->ID ) {
+		$abandoned_cart->customer_id = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_customer_id', true );
+		$abandoned_cart->emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', true );
+		$abandoned_cart->cart_status = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_status', true );
+		$abandoned_cart->cart_id     = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_id', true );
         return apply_filters( 'it_exchange_get_abandoned_cart', $abandoned_cart, $post );
+	}
     return apply_filters( 'it_exchange_get_abandoned_cart', false, $post );
 }
 
@@ -175,8 +190,13 @@ function it_exchange_abandoned_carts_process_qualified_shoppers_queue() {
 			// Test to see if last email was beyond the timeframe for this email
 			if ( $time_since_last_activity >= $props['time'] ) {
 				// Test to make sure the abandoned cart exists and has not received this email
-				if ( ! $abandoned_cart = it_exchange_get_active_abandoned_cart_for_user( $user_id ) )
-					$abandoned_cart = it_exchange_add_abondoned_cart( $user_id );
+				if ( ! $abandoned_cart = it_exchange_get_active_abandoned_cart_for_user( $user_id ) ) {
+					// Grab customer's current cached cart id
+					$cached_cart    = it_exchange_get_cached_customer_cart( $user_id );
+					$cached_cart_id = empty( $cached_cart['cart_id'][0] ) ? false : $cached_cart['cart_id'][0];
+
+					$abandoned_cart = it_exchange_add_abondoned_cart( $user_id, array( 'cart_id' => $cached_cart_id ) );
+				}
 
 				// Test to make sure abandoned cart hasn't already sent this email
 				if ( empty( $abandoned_cart->sent_emails[$email_id] ) ) {
@@ -206,9 +226,14 @@ function it_exchange_get_active_abandoned_cart_for_user( $customer_id ) {
 		return false;
 	// END TEMP
 
+	// Grab customer's current cached cart id
+	$cached_cart    = it_exchange_get_cached_customer_cart( $customer_id );
+	$cached_cart_id = empty( $cached_cart['cart_id'][0] ) ? false : $cached_cart['cart_id'][0];
+
 	$args = array(
 		'customer'    => $customer_id,
 		'cart_status' => 'abandoned',
+		'cart_id'     => $cached_cart_id,
 	);
 	$carts = it_exchange_get_abandoned_carts( $args );
 
@@ -243,6 +268,7 @@ function it_exchange_add_abondoned_cart( $user_id, $args=array() ) {
 		'post_status' => 'publish', // They will all be publish. We have a separate param for our status
 		'cart_status' => 'abandoned',
 		'ping_status' => 'closed',
+		'cart_id'     => false,
 	);
 
 	$args = wp_parse_args( $defaults, $args );
@@ -255,6 +281,7 @@ function it_exchange_add_abondoned_cart( $user_id, $args=array() ) {
 		update_post_meta( $abandoned_cart_id, '_it_exchange_abandoned_cart_customer_id', $user_id );
 		update_post_meta( $abandoned_cart_id, '_it_exchange_abandoned_cart_emails_sent', array() );
 		update_post_meta( $abandoned_cart_id, '_it_exchange_abandoned_cart_cart_status', $args['cart_status'] );
+		update_post_meta( $abandoned_cart_id, '_it_exchange_abandoned_cart_cart_id', $args['cart_id'] );
 
 		do_action( 'it_exchange_add_abandoned_cart_meta', $abandoned_cart_id, $user_id );
 		return it_exchange_get_abandoned_cart( $abandoned_cart_id );

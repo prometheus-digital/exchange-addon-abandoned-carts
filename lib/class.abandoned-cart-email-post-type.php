@@ -25,6 +25,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		$this->init();
 
 		add_action( 'save_post_it_ex_abandond_email', array( $this, 'save_abandoned_cart_email' ) );
+		add_action( 'it_exchange_save_abandoned_cart_email', array( $this, 'update_scheduling' ) );
 
 		if ( is_admin() ) {
 			add_filter( 'manage_edit-it_ex_abandond_email_columns', array( $this, 'modify_all_abandoned_cart_emails_table_columns' ) );
@@ -33,6 +34,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 			add_filter( 'it_exchange_abandoned_cart_email_metabox_callback', array( $this, 'register_abandoned_cart_email_details_admin_metabox' ) );
 			add_filter( 'enter_title_here', array( $this, 'modify_title_placeholder' ), 10, 2 );
 		}
+
 	}
 
 	function init() {
@@ -119,6 +121,45 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 
 		// This is called any time save_post hook
 		do_action( 'it_exchange_save_abandoned_cart_email', $post );
+	}
+
+	/**
+	 * Updates the scheduling on save
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	*/
+	function update_scheduling( $post_id ) {
+		if ( empty( $_POST['it-exchange-abandonded-cart-emails-scheduling']['updating'] ) )
+			return;
+
+		$human_readable_scheduling = empty( $_POST['it-exchange-abandonded-cart-emails-scheduling'] ) ? array(): $_POST['it-exchange-abandonded-cart-emails-scheduling'];
+		$unix_scheduling = false;
+
+		if ( ! empty( $human_readable_scheduling['int'] ) && ! empty( $human_readable_scheduling['unit'] ) ) {
+			// Set the base unit
+			switch ( $human_readable_scheduling['unit'] ) { 
+				case 'weeks' :
+					$base = WEEK_IN_SECONDS;
+					break;
+				case 'days' :
+					$base = DAY_IN_SECONDS;
+					break;
+				case 'hours' :
+					$base = HOUR_IN_SECONDS;
+					break;
+				case 'minutes' :
+				default        :   
+					$base = MINUTE_IN_SECONDS;
+					break;
+			}   
+			// Multiply the length times the units to get seconds for set frequency
+			$unix_scheduling = $human_readable_scheduling['int'] * $base;
+		}
+
+		update_post_meta( $post_id, '_it_exchange_abandoned_cart_emails_scheduling', $human_readable_scheduling );
+		update_post_meta( $post_id, '_it_exchange_abandoned_cart_emails_scheduling_unix', $unix_scheduling );
 	}
 
 	/**
@@ -279,21 +320,25 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	*/
 	function print_abandoned_cart_email_scheduling_metabox( $post ) {
 		do_action( 'it_exchange_before_abandoned_cart_scheduling' );
+		$human_readable = get_post_meta( $post->ID, '_it_exchange_abandoned_cart_emails_scheduling', true );
+		$selected_int   = empty( $human_readable['int'] ) ? 30 : $human_readable['int'];
+		$selected_unit  = empty( $human_readable['unit'] ) ? 'minutes' : $human_readable['unit'];
 		?>
 		<p><?php _e( 'How long should we wait to send this email after a customer abandons their cart?', 'LION' ); ?></p>
-		<select>
+		<select name="it-exchange-abandonded-cart-emails-scheduling[int]">
 		<?php
-		for( $i=1;$i<=30;$i++ ) { 
-			?><option value="<?php echo $i; ?>"><?php echo $i; ?></option><?php
+		for( $i=1;$i<=59;$i++ ) { 
+			?><option value="<?php echo $i; ?>" <?php selected( $i, $selected_int ); ?>><?php echo $i; ?></option><?php
 		}
 		?>
 		</select>
-		<select>
-			<option value="minutes"><?php _e( 'minutes', 'LION' ); ?></option>
-			<option value="hours"><?php _e( 'hours', 'LION' ); ?></option>
-			<option value="days"><?php _e( 'days', 'LION' ); ?></option>
-			<option value="weeks"><?php _e( 'weeks', 'LION' ); ?></option>
+		<select name="it-exchange-abandonded-cart-emails-scheduling[unit]">
+			<option value="minutes" <?php selected( 'minutes', $selected_unit ); ?>><?php _e( 'minutes', 'LION' ); ?></option>
+			<option value="hours" <?php selected( 'hours', $selected_unit ); ?>><?php _e( 'hours', 'LION' ); ?></option>
+			<option value="days" <?php selected( 'days', $selected_unit ); ?>><?php _e( 'days', 'LION' ); ?></option>
+			<option value="weeks" <?php selected( 'weeks', $selected_unit ); ?>><?php _e( 'weeks', 'LION' ); ?></option>
 		</select>
+		<input type="hidden" name="it-exchange-abandonded-cart-emails-scheduling[updating]" value="1" />
 		<?php
 	}
 
