@@ -74,7 +74,7 @@ function it_exchange_get_abandoned_cart( $post ) {
     $abandoned_cart = new IT_Exchange_Abandoned_Cart( $post );
     if ( $abandoned_cart->ID ) {
 		$abandoned_cart->customer_id = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_customer_id', true );
-		$abandoned_cart->emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', true );
+		$abandoned_cart->emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', false ); // false on purpose
 		$abandoned_cart->cart_status = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_status', true );
 		$abandoned_cart->cart_id     = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_id', true );
         return apply_filters( 'it_exchange_get_abandoned_cart', $abandoned_cart, $post );
@@ -199,7 +199,19 @@ function it_exchange_abandoned_carts_process_qualified_shoppers_queue() {
 				}
 
 				// Test to make sure abandoned cart hasn't already sent this email
-				if ( empty( $abandoned_cart->sent_emails[$email_id] ) ) {
+				$emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent' );
+
+				// Loop through sent emails and make sure that this email hasn't been sent already.
+				$email_already_sent = false;
+				foreach( (array) $abandoned_cart->emails_sent as $email ) {
+					if ( empty( $email['email_id'] ) )
+						continue;
+
+					if ( $email['email_id'] == $email_id )
+						$email_already_sent = true;
+				}
+				// Send it if it hasn't been sent
+				if (  empty( $email_already_sent ) ) {
 					it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $email_id );
 					break 1;
 				}
@@ -271,7 +283,7 @@ function it_exchange_add_abondoned_cart( $user_id, $args=array() ) {
 		'cart_id'     => false,
 	);
 
-	$args = wp_parse_args( $defaults, $args );
+	$args = wp_parse_args( $args, $defaults );
 
 	// Enforce or post type
 	$args['post_type'] = 'it_ex_abandoned';
@@ -343,7 +355,19 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 		return false;
 
 	// Send the email
-	wp_mail( 'glenn@ithemes.com', $email['subject'], $email['content'] );
+	$user = get_userdata( $abandoned_cart->customer_id );
+	if ( ! empty( $user->data->user_email ) ) {
+		wp_mail( $user->data->user_email, $email['subject'], $email['content'] );
+		$meta = array(
+			'email_id'     => $email_id,
+			'time_sent'    => time(),
+			'to'           => $user->data->user_email,
+			'subject'      => $email['subject'],
+			'message'      => $email['content'],
+			'cart_details' => it_exchange_get_cached_customer_cart( $abandoned_cart->customer_id ),
+		);
+		add_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', $meta );
+	}
 	//ho "<span style='font-weight:bold;'>" . $abandoned_cart->customer_id . '</span> will receive ' . $email['subject'] . '<br /><br />';
 }
 

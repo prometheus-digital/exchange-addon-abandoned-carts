@@ -54,7 +54,7 @@ class IT_Exchange_Abandoned_Cart {
 	 * Emails Sent. Array of email_id => time_sent
 	 * @var array
 	*/
-	var $emails_sent = array();
+	var $emails_sent;
 
 	/**
 	 * Constructor. Loads post data and product data
@@ -88,7 +88,7 @@ class IT_Exchange_Abandoned_Cart {
 		// Populate core postmeta
 		$this->customer_id = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_customer_id', true );
 		$this->cart_status = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_cart_status', true );
-		$this->emails_sent = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_emails_sent', true );
+		$this->emails_sent = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_emails_sent', false ); // False on purpose
 		do_action( 'it_exchange_abandoned_cart_populate_post_meta_object_properties', $this->ID );
 	}
 }
