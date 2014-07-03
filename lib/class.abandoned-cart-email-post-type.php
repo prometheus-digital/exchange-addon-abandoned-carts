@@ -205,8 +205,8 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		// All Core should be removed at this point. Build ours back (including date from core)
 		$exchange_columns = array(
 			'cb'                                                   => $check,
+			'title'                                                => __( 'Subject', 'LION' ),
 			'it_exchange_abandoned_cart_email_status_column'       => __( 'Status', 'LION' ),
-			'it_exchange_abandoned_cart_email_subject_column'      => __( 'Subject', 'LION' ),
 			'it_exchange_abandoned_cart_email_scheduling_column'   => __( 'Scheduling', 'LION' ),
 			'it_exchange_abandoned_cart_email_delivered_column'    => __( 'Emails Sent', 'LION' ),
 			'it_exchange_abandoned_cart_email_opened_column'       => __( 'Opened Rate', 'LION' ),

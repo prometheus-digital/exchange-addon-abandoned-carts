@@ -295,23 +295,27 @@ function it_exchange_add_abondoned_cart( $user_id, $args=array() ) {
  * @return array
 */
 function it_exchange_abandoned_carts_get_abandonment_emails() {
-	$five   = 60 * 60 * 5;
-	$twenty = 149500; //60 * 60 * 20;
 
-	$emails = array(
-		$twenty => array(
-			'title'   => 'Twenty Minute Email',
-			'time'    => $twenty,
-			'subject' => 'You you forgot to checkout, Coupon',
-			'content' => 'This the content for the hard sell',
-		),
-		$five => array(
-			'title'   => 'Five Minute Email',
-			'time'    => $five,
-			'subject' => 'You you forgot to checkout, soft reminder',
-			'content' => 'This the content for the soft sell',
-		),
+	$args = array(
+		'post_type'      => 'it_ex_abandond_email',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
 	);
+	$email_templates = get_posts( $args );
+
+	$emails = array();
+	foreach( (array) $email_templates as $template ) {
+		$subject         = get_the_title( $template->ID );
+		$temp            = $GLOBALS['post'];
+		$GLOBALS['post'] = $template;
+		$message         = apply_filters( 'the_content', $template->post_content );
+		$GLOBALS['post'] = $temp;
+		$scheduling      = get_post_meta( $template->ID, '_it_exchange_abandoned_cart_emails_scheduling_unix', true );
+
+		if ( ! empty( $subject ) && ! empty( $message ) && ! empty( $scheduling ) )
+			$emails[$scheduling] = array( 'title' => $subject, 'subject' => $subject, 'time' => $scheduling, 'content' => $message );
+	}
+
 	krsort( $emails );
 	return $emails;
 }
@@ -339,7 +343,8 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 		return false;
 
 	// Send the email
-	echo "<span style='font-weight:bold;'>" . $abandoned_cart->customer_id . '</span> will receive ' . $email['subject'] . '<br /><br />';
+	wp_mail( 'glenn@ithemes.com', $email['subject'], $email['content'] );
+	//ho "<span style='font-weight:bold;'>" . $abandoned_cart->customer_id . '</span> will receive ' . $email['subject'] . '<br /><br />';
 }
 
 /**
