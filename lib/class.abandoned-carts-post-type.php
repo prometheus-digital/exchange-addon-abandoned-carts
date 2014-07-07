@@ -43,6 +43,9 @@ class IT_Exchange_Abandoned_Cart_Post_Type {
 		$labels    = array(
 			'name'          => __( 'Abandoned Carts', 'LION' ),
 			'singular_name' => __( 'Abandoned Cart', 'LION' ),
+            'search_items'       => __( 'Search Carts', 'LION' ),
+            'not_found'          => __( 'No carts found', 'LION' ),
+            'not_found_in_trash' => __( 'No carts found in trash', 'LION' ),
 		);
 		$this->options = array(
 			'labels'               => $labels,

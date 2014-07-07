@@ -41,9 +41,14 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 
 		$this->post_type = 'it_ex_abandond_email';
 		$labels    = array(
-			'name'          => __( 'Abandoned Cart Email Templates', 'LION' ),
-			'singular_name' => __( 'Abandoned Cart Email Template', 'LION' ),
-			'add_new_item'  => __( 'Add New Email Template', 'LION' ),
+			'name'               => __( 'Abandoned Cart Email Templates', 'LION' ),
+			'singular_name'      => __( 'Abandoned Cart Email Template', 'LION' ),
+			'add_new_item'       => __( 'Add New Email Template', 'LION' ),
+			'edit_item'          => __( 'Edit Email Template', 'LION' ),
+			'new_item'           => __( 'New Email Template', 'LION' ),
+			'search_items'       => __( 'Search Templates', 'LION' ),
+			'not_found'          => __( 'No templates found', 'LION' ),
+			'not_found_in_trash' => __( 'No templates found in trash', 'LION' ),
 		);
 		$this->options = array(
 			'labels'               => $labels,
