@@ -35,7 +35,7 @@ function it_exchange_abandoned_carts_register_scripts( $hook ) {
 	}
 
 	// All emails screen
-	if ( ! empty( $screen->id ) && 'edit-it_ex_abandond_email' == $screen->id )
+	if ( ! empty( $screen->id ) && ( 'edit-it_ex_abandond_email' == $screen->id || 'it_ex_abandond_email' == $screen->id ) )
 		wp_enqueue_script( 'ithems-exchange-abandoned-carts-dashboard', ITUtility::get_url_from_file( dirname( __FILE__ ) ) . '/js/admin-emails.js' );
 
 	// Any of our admin pages
@@ -196,3 +196,17 @@ function it_exchange_abandoned_carts_open_exchange_menu_on_post_type_views( $par
 	return 'it-exchange';
 }
 add_filter( 'parent_file', 'it_exchange_abandoned_carts_open_exchange_menu_on_post_type_views' );
+
+/**
+ * Adds "Back to All Email Templates" link to add/edit email templates
+ *
+ * @since 1.0.0
+ *
+ * @return void
+*/
+function it_exchange_abandoned_carts_add_admin_link_for_all_email_templates() {
+	$current_screen = get_current_screen();
+	if ( ! empty( $current_screen->id ) && 'it_ex_abandond_email' == $current_screen->id )
+		echo '<a class="it-exchange-back-to-all-abandoned-cart-templates h2-add-new hidden" href="' . get_admin_url() . '/edit.php?post_type=it_ex_abandond_email' . '">' . __( '&#8592; Back to all email templates', 'LION' ) . '</a>';
+}
+add_action( 'admin_footer', 'it_exchange_abandoned_carts_add_admin_link_for_all_email_templates' );
