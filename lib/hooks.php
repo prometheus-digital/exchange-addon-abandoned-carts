@@ -174,3 +174,25 @@ add_filter( 'views_edit-it_ex_abandoned', 'it_exchange_abdandoned_carts_insert_c
 add_filter( 'views_edit-it_ex_abandond_email', 'it_exchange_abdandoned_carts_insert_custom_dashboard' );
 add_filter( 'views_edit-it_ex_abandond_carts_dashboard', 'it_exchange_abdandoned_carts_insert_custom_dashboard' );
 add_filter( 'views_edit-it_ex_abandond_carts_settings', 'it_exchange_abdandoned_carts_insert_custom_dashboard' );
+
+/**  
+ * Opens the iThemes Exchange Admin Menu when viewing the Add Cart and Email pages
+ *
+ * @since Changeme
+ * @return string
+*/
+function it_exchange_abandoned_carts_open_exchange_menu_on_post_type_views( $parent_file, $revert=false ) {
+	global $submenu_file, $pagenow, $post;
+
+	if ( 'post-new.php' != $pagenow && 'post.php' != $pagenow && 'edit.php' != $pagenow )
+		return $parent_file;
+
+	if ( empty( $post->post_type ) || ( 'it_ex_abandoned' != $post->post_type && 'it_ex_abandond_email' != $post->post_type ) )
+		return $parent_file;
+
+	$submenu_file = 'it-exchange-abandoned-carts-dashboard';
+
+	// Return it-exchange as the parent (open) menu when on post-new.php and post.php for it_exchange_prod post_types
+	return 'it-exchange';
+}
+add_filter( 'parent_file', 'it_exchange_abandoned_carts_open_exchange_menu_on_post_type_views' );
