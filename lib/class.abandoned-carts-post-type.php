@@ -242,9 +242,13 @@ class IT_Exchange_Abandoned_Cart_Post_Type {
 					break;
 				}
 
+				$emails_sent = array();
 				foreach( $abandoned_cart->emails_sent as $email ) {
-					if ( isset( $emails[$email]['title'] ) ) {
-						$emails_sent[] = $emails[$email]['title'];
+					if ( empty( $email['email_id'] ) )
+						continue;
+
+					if ( ! empty( $email['subject'] ) ) {
+						$emails_sent[] = $email['subject'];
 					}
 				};
 				echo implode( $emails_sent, '<br />' );
