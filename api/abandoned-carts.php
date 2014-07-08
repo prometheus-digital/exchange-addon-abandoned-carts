@@ -213,8 +213,8 @@ function it_exchange_abandoned_carts_process_qualified_shoppers_queue() {
 				// Send it if it hasn't been sent
 				if (  empty( $email_already_sent ) ) {
 					it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $email_id );
-					break 1;
 				}
+				break 1;
 			}
 		}
 	}
@@ -244,7 +244,6 @@ function it_exchange_get_active_abandoned_cart_for_user( $customer_id ) {
 
 	$args = array(
 		'customer'    => $customer_id,
-		'cart_status' => 'abandoned',
 		'cart_id'     => $cached_cart_id,
 	);
 	$carts = it_exchange_get_abandoned_carts( $args );
