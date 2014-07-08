@@ -242,3 +242,29 @@ function it_exchange_abandoned_carts_handle_opened_email_ping() {
 	die();
 }
 add_action( 'wp', 'it_exchange_abandoned_carts_handle_opened_email_ping' );
+
+/**
+ * Register a click through for an email.
+ *
+ * Marks the abandoned cart as 'reengaged' but not recovered
+ *
+ * @since 1.0.0
+ *
+ * @return void
+*/
+function it_exchange_abandoned_carts_handle_email_clickthrough() {
+	if ( empty( $_GET['iterab'] ) )
+		return;
+
+	$parts    = explode( '-', $_GET['iterab'] );
+	$email_id = substr( $parts[1], 7, -5 );
+	$cart_id  = substr( $parts[3], 0, -3 );
+
+	// Mark as clicked through
+	it_exchange_abandoned_carts_mark_email_clicked_through( $email_id, $cart_id );
+
+	// Redirect to the cart
+	it_exchange_redirect( it_exchange_get_page_url( 'cart' ), 'it-exchange-abandoned-email-clickthrough', array( 'email_id' => $email_id, 'cart_id' => $cart_id ) );
+	die();
+}
+add_action( 'wp', 'it_exchange_abandoned_carts_handle_email_clickthrough' );

@@ -353,6 +353,9 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 	if ( empty( $email ) )
 		return false;
 
+	// Temp Add Tracking code here
+	$email['content'] .= '<a href="' . it_exchange_generate_reclaim_link_for_abandoned_email( $email_id, $abandoned_cart->ID ) . '">' . __( 'Finish Shopping', 'LION' ) . '</a>';
+
 	// Add tracking code
 	$email['content'] .= '<img src="' . add_query_arg( array( 'it-exchange-cart-summary' => $email_id . '-'  . $abandoned_cart->ID ), get_home_url() )  . '" width="1" height="1" />';
 
@@ -476,7 +479,6 @@ function it_exchange_abandoned_carts_mark_email_opened( $email_id, $cart_id ) {
 	// If we made it this far the abadoned cart's sent_email has been flagged as open and we need to increment the opens for the email.
 	$opened = (int) get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_opened', true );
 	update_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_opened', ( $opened + 1 ) );
-	//delete_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_opened' );
 }
 
 /**
@@ -496,12 +498,72 @@ function it_exchange_get_abandoned_cart_email_opened_rate( $email_id ) {
 	return empty( $percentage )? 0 . '%' : $percentage . '%';
 }
 
+/**
+ * Generate the reclaim link for a specific email
+ *
+ * @since 1.0.0
+ *
+ * @param int $email_id the WP post id for the email
+ * @param int $cart_id  the abandoned cart id
+ * @return string
+*/
+function it_exchange_generate_reclaim_link_for_abandoned_email( $email_id, $cart_id ) {
+	$rmd5             = md5( rand() );
+	$obfuscation_ftw  = substr( $rmd5, 0, 1 );
+	$obfuscation_ftw .= '-' . substr( $rmd5, 1, 7 ) . $email_id . substr( $rmd5, 8, 5 ); 
+	$obfuscation_ftw .= '-' . substr( $rmd5, 13, 4 );
+	$obfuscation_ftw .= '-' . $cart_id . substr( $rmd5, 17, 3 );
+	$obfuscation_ftw .= '-' . substr( $rmd5, 20 );
+	return add_query_arg( array( 'iterab' => $obfuscation_ftw ), get_home_url() );
+}
+
+/**
+ * Marks an email as clicked through
+ *
+ * @since 1.0.0
+ *
+ * @return void
+*/
+function it_exchange_abandoned_carts_mark_email_clicked_through( $email_id, $cart_id ) {
+	$cart_emails = get_post_meta( $cart_id, '_it_exchange_abandoned_cart_emails_sent', true );
+
+	// Make sure this email hasn't already been credited for reengaging the custumer.
+	foreach( (array) $cart_emails as $key => $email ) {
+		if ( ! empty( $email['email_id'] ) && $email['email_id'] == $email_id && ! empty( $email['clickedthrough'] ) ) {
+			return;
+		} else if ( ! empty( $email['email_id'] ) && $email['email_id'] == $email_id ) {
+			$cart_emails[$key]['clickedthrough'] = time();
+			update_post_meta( $cart_id, '_it_exchange_abandoned_cart_emails_sent', $cart_emails );
+		}
+	}
+
+	// If we made it this far the abadoned cart's sent_email has been flagged as reengaged and we need to increment the clickthroughs for the email.
+	$clickedthrough = (int) get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_clickedthrough', true );
+	update_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_clickedthrough', ( $clickedthrough + 1 ) );
+}
+
+/**
+ * Returns the percentage of clickthroughs for a specific email template
+ *
+ * @since 1.0.0
+ *
+ * @param int $email_id the wp post id for the email
+ *
+ * @return int
+*/
+function it_exchange_get_abandoned_cart_email_clickthrough_rate( $email_id ) {
+	$clickedthrough = (int) get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_clickedthrough', true );
+	$sent           = it_exchange_get_abandoned_cart_email_times_sent( $email_id );
+
+	$percentage = empty( $clickedthrough ) || empty( $sent ) ? 0 : $clickedthrough/$sent*100;
+	return empty( $percentage )? 0 . '%' : $percentage . '%';
+}
+
 function debug_abandoned_carts() {
 	if ( is_admin() )
 		return;
 
 	$plugin_options = it_exchange_get_option( 'addon_abandoned_carts' );
 	ITUtility::print_r($plugin_options);
-
 }
 //add_action( 'wp_footer', 'debug_abandoned_cats' );
