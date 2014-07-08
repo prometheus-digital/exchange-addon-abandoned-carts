@@ -74,7 +74,7 @@ function it_exchange_get_abandoned_cart( $post ) {
     $abandoned_cart = new IT_Exchange_Abandoned_Cart( $post );
     if ( $abandoned_cart->ID ) {
 		$abandoned_cart->customer_id = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_customer_id', true );
-		$abandoned_cart->emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', false ); // false on purpose
+		$abandoned_cart->emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', true );
 		$abandoned_cart->cart_status = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_status', true );
 		$abandoned_cart->cart_id     = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_id', true );
         return apply_filters( 'it_exchange_get_abandoned_cart', $abandoned_cart, $post );
@@ -195,11 +195,11 @@ function it_exchange_abandoned_carts_process_qualified_shoppers_queue() {
 					$cached_cart    = it_exchange_get_cached_customer_cart( $user_id );
 					$cached_cart_id = empty( $cached_cart['cart_id'][0] ) ? false : $cached_cart['cart_id'][0];
 
-					$abandoned_cart = it_exchange_add_abondoned_cart( $user_id, array( 'cart_id' => $cached_cart_id ) );
+					$abandoned_cart = it_exchange_add_abandoned_cart( $user_id, array( 'cart_id' => $cached_cart_id ) );
 				}
 
 				// Test to make sure abandoned cart hasn't already sent this email
-				$emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent' );
+				$emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', true );
 
 				// Loop through sent emails and make sure that this email hasn't been sent already.
 				$email_already_sent = false;
@@ -265,7 +265,7 @@ function it_exchange_get_active_abandoned_cart_for_user( $customer_id ) {
  * @param  int $user_id the WP user id for the exchange customer
  * @return int the wp post id
 */
-function it_exchange_add_abondoned_cart( $user_id, $args=array() ) {
+function it_exchange_add_abandoned_cart( $user_id, $args=array() ) {
 	// Confirm we have a legit exchagne user
 	if ( ! $customer = it_exchange_get_customer( $user_id ) )
 		return false;
@@ -290,7 +290,6 @@ function it_exchange_add_abondoned_cart( $user_id, $args=array() ) {
 	// Insert the post
 	if ( $abandoned_cart_id = wp_insert_post( $args ) ) {
 		update_post_meta( $abandoned_cart_id, '_it_exchange_abandoned_cart_customer_id', $user_id );
-		update_post_meta( $abandoned_cart_id, '_it_exchange_abandoned_cart_emails_sent', array() );
 		update_post_meta( $abandoned_cart_id, '_it_exchange_abandoned_cart_cart_status', $args['cart_status'] );
 		update_post_meta( $abandoned_cart_id, '_it_exchange_abandoned_cart_cart_id', $args['cart_id'] );
 
@@ -346,6 +345,7 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 	if ( ! is_object( $abandoned_cart ) || 'IT_Exchange_Abandoned_Cart' != get_class( $abandoned_cart ) )
 		return false;
 
+	// Grab the email template we want to send
 	$emails = it_exchange_abandoned_carts_get_abandonment_emails();
 	$email  = isset( $emails[$email_id] ) ? $emails[$email_id] : false;
 
@@ -353,12 +353,17 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 	if ( empty( $email ) )
 		return false;
 
+	// Add tracking code
+	$email['content'] .= '<img src="' . add_query_arg( array( 'it-exchange-cart-summary' => $email_id . '-'  . $abandoned_cart->ID ), get_home_url() )  . '" width="1" height="1" />';
+
 	// Send the email
 	$user = get_userdata( $abandoned_cart->customer_id );
 	if ( ! empty( $user->data->user_email ) ) {
 		add_filter( 'wp_mail_content_type', 'it_exchange_abandoned_cart_set_email_content_type' );
 		wp_mail( $user->data->user_email, $email['subject'], $email['content'] );
 		remove_filter( 'wp_mail_content_type', 'it_exchange_abandoned_cart_set_email_content_type' );
+
+		// After sending the email, add this email to the list of emails sent for this abandoned cart
 		$meta = array(
 			'email_id'     => $email_id,
 			'time_sent'    => time(),
@@ -367,8 +372,14 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 			'message'      => $email['content'],
 			'cart_details' => it_exchange_get_cached_customer_cart( $abandoned_cart->customer_id ),
 		);
-		add_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', $meta );
+		// Grab existing emails
+		$emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', true );
+		// Add this email info to the emails_sent array
+		$emails_sent[$email_id] = $meta;
+		// Update the post meta for the abadoned cart
+		update_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', $emails_sent );
 
+		// Also update the number of times this email template has been delivered
 		$number_sent = get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', true );
 		update_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', ($number_sent + 1) );
 	}
@@ -435,11 +446,54 @@ function it_exchange_get_abandoned_cart_email_human_readable_schedule( $email_id
  *
  * @param int $email_id the wp post id for the email
  *
- * @return string
+ * @return int
 */
 function it_exchange_get_abandoned_cart_email_times_sent( $email_id ) {
 	$sent = (int) get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', true );
 	return empty( $sent ) ? 0 : $sent;
+}
+
+/**
+ * Marks an email as opened
+ *
+ * @since 1.0.0
+ *
+ * @return void
+*/
+function it_exchange_abandoned_carts_mark_email_opened( $email_id, $cart_id ) {
+	$cart_emails = get_post_meta( $cart_id, '_it_exchange_abandoned_cart_emails_sent', true );
+
+	// Make sure this email hasn't already been counted.
+	foreach( (array) $cart_emails as $key => $email ) {
+		if ( ! empty( $email['email_id'] ) && $email['email_id'] == $email_id && ! empty( $email['opened'] ) ) {
+			return;
+		} else if ( ! empty( $email['email_id'] ) && $email['email_id'] == $email_id ) {
+			$cart_emails[$key]['opened'] = time();
+			update_post_meta( $cart_id, '_it_exchange_abandoned_cart_emails_sent', $cart_emails );
+		}
+	}
+
+	// If we made it this far the abadoned cart's sent_email has been flagged as open and we need to increment the opens for the email.
+	$opened = (int) get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_opened', true );
+	update_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_opened', ( $opened + 1 ) );
+	//delete_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_opened' );
+}
+
+/**
+ * Returns the number of times a specific email has been opened.
+ *
+ * @since 1.0.0
+ *
+ * @param int $email_id the wp post id for the email
+ *
+ * @return int
+*/
+function it_exchange_get_abandoned_cart_email_opened_rate( $email_id ) {
+	$opened = (int) get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_opened', true );
+	$sent   = it_exchange_get_abandoned_cart_email_times_sent( $email_id );
+
+	$percentage = empty( $opened ) || empty( $sent ) ? 0 : $opened/$sent*100;
+	return empty( $percentage )? 0 . '%' : $percentage . '%';
 }
 
 function debug_abandoned_carts() {

@@ -222,3 +222,23 @@ add_action( 'admin_footer', 'it_exchange_abandoned_carts_add_admin_link_for_all_
 function it_exchange_abandoned_cart_set_email_content_type( $content_type ) {
 	return 'text/html';
 }
+
+/**
+ * Mark an email as read
+ *
+ * @since 1.0.0
+ *
+ * @return void
+*/
+function it_exchange_abandoned_carts_handle_opened_email_ping() {
+	if ( empty( $_GET['it-exchange-cart-summary'] ) )
+		return;
+
+	$parts = explode( '-', $_GET['it-exchange-cart-summary'] );
+	$email_id = empty( $parts[0] ) ? 0 : $parts[0];
+	$cart_id = empty( $parts[1] ) ? 0 : $parts[1];
+	if ( ! empty( $email_id ) && ! empty( $cart_id ) )
+		it_exchange_abandoned_carts_mark_email_opened( $email_id, $cart_id );
+	die();
+}
+add_action( 'wp', 'it_exchange_abandoned_carts_handle_opened_email_ping' );

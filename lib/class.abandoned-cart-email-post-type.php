@@ -263,7 +263,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 				echo it_exchange_get_abandoned_cart_email_times_sent( $post->ID );
 				break;
 			case 'it_exchange_abandoned_cart_email_opened_column' :
-				echo '30%';
+				echo it_exchange_get_abandoned_cart_email_opened_rate( $post->ID );
 				break;
 			case 'it_exchange_abandoned_cart_email_clickthrough_column' :
 				echo '20%';
