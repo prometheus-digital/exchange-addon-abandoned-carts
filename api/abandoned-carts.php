@@ -356,7 +356,9 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 	// Send the email
 	$user = get_userdata( $abandoned_cart->customer_id );
 	if ( ! empty( $user->data->user_email ) ) {
+		add_filter( 'wp_mail_content_type', 'it_exchange_abandoned_cart_set_email_content_type' );
 		wp_mail( $user->data->user_email, $email['subject'], $email['content'] );
+		remove_filter( 'wp_mail_content_type', 'it_exchange_abandoned_cart_set_email_content_type' );
 		$meta = array(
 			'email_id'     => $email_id,
 			'time_sent'    => time(),

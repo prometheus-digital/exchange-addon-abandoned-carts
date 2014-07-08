@@ -210,3 +210,15 @@ function it_exchange_abandoned_carts_add_admin_link_for_all_email_templates() {
 		echo '<a class="it-exchange-back-to-all-abandoned-cart-templates h2-add-new hidden" href="' . get_admin_url() . '/edit.php?post_type=it_ex_abandond_email' . '">' . __( '&#8592; Back to all email templates', 'LION' ) . '</a>';
 }
 add_action( 'admin_footer', 'it_exchange_abandoned_carts_add_admin_link_for_all_email_templates' );
+
+/**
+ * Sets content type to HTML for our emails
+ *
+ * @since 1.0.0
+ *
+ * @param string $content_type the incoming content type
+ * @return string
+*/
+function it_exchange_abandoned_cart_set_email_content_type( $content_type ) {
+	return 'text/html';
+}
