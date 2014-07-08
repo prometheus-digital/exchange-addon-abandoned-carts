@@ -324,7 +324,7 @@ function it_exchange_abandoned_carts_get_abandonment_emails() {
 		$scheduling      = get_post_meta( $template->ID, '_it_exchange_abandoned_cart_emails_scheduling_unix', true );
 
 		if ( ! empty( $subject ) && ! empty( $message ) && ! empty( $scheduling ) )
-			$emails[$scheduling] = array( 'title' => $subject, 'subject' => $subject, 'time' => $scheduling, 'content' => $message );
+			$emails[$template->ID] = array( 'title' => $subject, 'subject' => $subject, 'time' => $scheduling, 'content' => $message );
 	}
 
 	krsort( $emails );
@@ -366,8 +366,10 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 			'cart_details' => it_exchange_get_cached_customer_cart( $abandoned_cart->customer_id ),
 		);
 		add_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', $meta );
+
+		$number_sent = get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', $meta, true );
+		add_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', ($number_sent + 1) );
 	}
-	//ho "<span style='font-weight:bold;'>" . $abandoned_cart->customer_id . '</span> will receive ' . $email['subject'] . '<br /><br />';
 }
 
 /**
