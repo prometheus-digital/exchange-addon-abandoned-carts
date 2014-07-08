@@ -9,11 +9,11 @@
  * @since 1.0.0
  * @return array  an array of IT_Exchange_Abandoned_Cart objects
 */
-function it_exchange_get_abandoned_carts( $args=array() ) { 
+function it_exchange_get_abandoned_carts( $args=array() ) {
     $defaults = array(
         'cart_status' => 'abandoned',
 		'customer'    => false,
-    );  
+    );
     $args = wp_parse_args( $args, $defaults );
 
 	// Force post type
@@ -23,27 +23,27 @@ function it_exchange_get_abandoned_carts( $args=array() ) {
     $args['meta_query'] = empty( $args['meta_query'] ) ? array() : $args['meta_query'];
 
 	// Add cart_status to meta_query if not empty
-    if ( ! empty( $args['cart_status'] ) ) { 
+    if ( ! empty( $args['cart_status'] ) ) {
         $meta_query = array(
             'key'   => '_it_exchange_abandoned_cart_cart_status',
             'value' => $args['cart_status'],
-        );  
+        );
         $args['meta_query'][] = $meta_query;
         unset( $args['cart_status'] ); //remove this so it doesn't conflict with the meta query
     }
 
 	// Add cart_id to meta_query if not empty
-    if ( ! empty( $args['cart_id'] ) ) { 
+    if ( ! empty( $args['cart_id'] ) ) {
         $meta_query = array(
             'key'   => '_it_exchange_abandoned_cart_cart_id',
             'value' => $args['cart_id'],
-        );  
+        );
         $args['meta_query'][] = $meta_query;
         unset( $args['cart_id'] ); //remove this so it doesn't conflict with the meta query
     }
 
 	// Add customer if not empty
-    if ( ! empty( $args['customer'] ) ) { 
+    if ( ! empty( $args['customer'] ) ) {
         $meta_query = array(
             'key'   => '_it_exchange_abandoned_cart_customer_id',
             'value' => $args['customer'],
@@ -54,10 +54,10 @@ function it_exchange_get_abandoned_carts( $args=array() ) {
 	unset( $args['customer'] );
 
     $abandoned_carts = false;
-    if ( $abandoned_carts = get_posts( $args ) ) { 
-        foreach( $abandoned_carts as $key => $abandoned_cart ) { 
+    if ( $abandoned_carts = get_posts( $args ) ) {
+        foreach( $abandoned_carts as $key => $abandoned_cart ) {
             $abandoned_carts[$key] = it_exchange_get_abandoned_cart( $abandoned_cart );
-        }   
+        }
     }
 
     return apply_filters( 'it_exchange_get_abandoned_carts', $abandoned_carts, $args );
@@ -269,7 +269,7 @@ function it_exchange_add_abondoned_cart( $user_id, $args=array() ) {
 	// Confirm we have a legit exchagne user
 	if ( ! $customer = it_exchange_get_customer( $user_id ) )
 		return false;
-	
+
 	/**
 	 * @todo Will need to do something here to clean up any potential old abandoned carts for user
 	 * while not altering past reports (not deleting any completed / converted carts )
@@ -337,7 +337,7 @@ function it_exchange_abandoned_carts_get_abandonment_emails() {
  * @since 1.0.0
  *
  * @param mixed $abandoned_cart object or id
- * @parma int   $email_id      the email id 
+ * @parma int   $email_id      the email id
 */
 function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $email_id ) {
 	// Make sure the abandoned_cart is an object
@@ -367,8 +367,8 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 		);
 		add_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', $meta );
 
-		$number_sent = get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', $meta, true );
-		add_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', ($number_sent + 1) );
+		$number_sent = get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', true );
+		update_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', ($number_sent + 1) );
 	}
 }
 
@@ -405,6 +405,39 @@ function it_exchange_get_abanonded_cart_status_label( $abandoned_cart ) {
 	}
 
 	return apply_filters( 'it_exchange_get_abanonded_cart_status_label', $label, $abandoned_cart );
+}
+
+/**
+ * Returns the human readable version of the scheduling for an email
+ *
+ * @since 1.0.0
+ *
+ * @param int $email_id the wp post id for the email
+ *
+ * @return string
+*/
+function it_exchange_get_abandoned_cart_email_human_readable_schedule( $email_id ) {
+	$scheduling = get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_scheduling', true );
+	if ( ! empty( $scheduling['int'] ) && ! empty( $scheduling['unit'] ) )
+		$value = sprintf( _n( '1 ' . rtrim( $scheduling['unit'], 's' ), "%d " . $scheduling['unit'], $scheduling['int'], 'LION' ), $scheduling['int'] );
+	else
+		$value = __( 'Unknown', 'LION' );
+
+	return $value;
+}
+
+/**
+ * Returns the number of times a specific email has been sent.
+ *
+ * @since 1.0.0
+ *
+ * @param int $email_id the wp post id for the email
+ *
+ * @return string
+*/
+function it_exchange_get_abandoned_cart_email_times_sent( $email_id ) {
+	$sent = (int) get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', true );
+	return empty( $sent ) ? 0 : $sent;
 }
 
 function debug_abandoned_carts() {

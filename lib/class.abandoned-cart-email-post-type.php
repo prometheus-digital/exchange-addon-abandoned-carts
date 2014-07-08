@@ -257,10 +257,10 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 				esc_attr_e( get_the_title( $post->ID ) );
 				break;
 			case 'it_exchange_abandoned_cart_email_scheduling_column' :
-				echo '30 minutes';
+				echo it_exchange_get_abandoned_cart_email_human_readable_schedule( $post->ID );
 				break;
 			case 'it_exchange_abandoned_cart_email_delivered_column' :
-				echo '50';
+				echo it_exchange_get_abandoned_cart_email_times_sent( $post->ID );
 				break;
 			case 'it_exchange_abandoned_cart_email_opened_column' :
 				echo '30%';
