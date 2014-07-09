@@ -159,11 +159,15 @@ function it_exchange_abandoned_carts_update_last_qualified_activity_for_user( $c
 	$queue[$customer_id] = $now;
 	it_exchange_abandoned_carts_update_qualified_shoppers_queue( $queue );
 
-	// If user has an abandoned cart, mark it as reengaged
-	if ( $cart = it_exchange_get_active_abandoned_cart_for_user( $customer_id ) ) {
-		if ( 'abandoned' == $cart->cart_status )
-			update_post_meta( $cart->ID, '_it_exchange_abandoned_cart_cart_status', 'reengaged' );
-	}
+	/**
+	 * @todo Introduce this in a later version along with lost / usubscribed and other statuses
+	 *
+	 * // If user has an abandoned cart, mark it as reengaged
+	 * if ( $cart = it_exchange_get_active_abandoned_cart_for_user( $customer_id ) ) {
+	 * if ( 'abandoned' == $cart->cart_status )
+	 * update_post_meta( $cart->ID, '_it_exchange_abandoned_cart_cart_status', 'reengaged' );
+	 * }
+	*/
 }
 
 /**

@@ -7,7 +7,7 @@
  * @return void
 */
 function it_exchange_abandoned_carts_bump_active_shopper( $customer, $cart_data ) {
-	// If user deleted cart, remove them as a qualified shopper and mark the cart as lost.
+	// If user deleted cart, remove them as a qualified shopper
 	if ( empty( $cart_data['products'] ) ) {
 		it_exchange_abandoned_carts_delete_last_qualified_activity_for_user( $customer->id );
 		return;
@@ -287,4 +287,6 @@ function it_exchange_mark_abandoned_cart_as_lost( $session_data_before_emptied )
 		}
 	}
 }
+/** @todo  Introduce more statuses in later version
 add_action( 'it_exchange_before_empty_shopping_cart', 'it_exchange_mark_abandoned_cart_as_lost', 10, 1 );
+*/
