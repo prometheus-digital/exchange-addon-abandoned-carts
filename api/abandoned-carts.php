@@ -23,7 +23,7 @@ function it_exchange_get_abandoned_carts( $args=array() ) {
     $args['meta_query'] = empty( $args['meta_query'] ) ? array() : $args['meta_query'];
 
 	// Add cart_status to meta_query if not empty
-    if ( ! empty( $args['cart_status'] ) ) {
+    if ( ! empty( $args['cart_status'] ) && 'any' != $args['cart_status'] ) {
         $meta_query = array(
             'key'   => '_it_exchange_abandoned_cart_cart_status',
             'value' => $args['cart_status'],
@@ -160,8 +160,10 @@ function it_exchange_abandoned_carts_update_last_qualified_activity_for_user( $c
 	it_exchange_abandoned_carts_update_qualified_shoppers_queue( $queue );
 
 	// If user has an abandoned cart, mark it as reengaged
-	if ( $cart = it_exchange_get_active_abandoned_cart_for_user( $customer_id ) )
-		update_post_meta( $cart->ID, '_it_exchange_abandoned_cart_cart_status', 'reengaged' );
+	if ( $cart = it_exchange_get_active_abandoned_cart_for_user( $customer_id ) ) {
+		if ( 'abandoned' == $cart->cart_status )
+			update_post_meta( $cart->ID, '_it_exchange_abandoned_cart_cart_status', 'reengaged' );
+	}
 }
 
 /**
@@ -192,10 +194,11 @@ function it_exchange_abandoned_carts_process_qualified_shoppers_queue() {
 				// Test to make sure the abandoned cart exists and has not received this email
 				if ( ! $abandoned_cart = it_exchange_get_active_abandoned_cart_for_user( $user_id ) ) {
 					// Grab customer's current cached cart id
-					$cached_cart    = it_exchange_get_cached_customer_cart( $user_id );
-					$cached_cart_id = empty( $cached_cart['cart_id'][0] ) ? false : $cached_cart['cart_id'][0];
+					$cached_cart       = it_exchange_get_cached_customer_cart( $user_id );
+					$cached_cart_id    = empty( $cached_cart['cart_id'][0] ) ? false : $cached_cart['cart_id'][0];
+					$cached_cart_value = it_exchange_get_cart_total( true, array( 'use_cached_customer_cart' => $user_id ) );
 
-					$abandoned_cart = it_exchange_add_abandoned_cart( $user_id, array( 'cart_id' => $cached_cart_id ) );
+					$abandoned_cart = it_exchange_add_abandoned_cart( $user_id, array( 'cart_id' => $cached_cart_id, 'cart_value' => $cached_cart_value ) );
 				}
 
 				// Test to make sure abandoned cart hasn't already sent this email
@@ -278,6 +281,7 @@ function it_exchange_add_abandoned_cart( $user_id, $args=array() ) {
 	$defaults = array(
 		'post_status' => 'publish', // They will all be publish. We have a separate param for our status
 		'cart_status' => 'abandoned',
+		'cart_value'  => false,
 		'ping_status' => 'closed',
 		'cart_id'     => false,
 	);
@@ -291,6 +295,7 @@ function it_exchange_add_abandoned_cart( $user_id, $args=array() ) {
 	if ( $abandoned_cart_id = wp_insert_post( $args ) ) {
 		update_post_meta( $abandoned_cart_id, '_it_exchange_abandoned_cart_customer_id', $user_id );
 		update_post_meta( $abandoned_cart_id, '_it_exchange_abandoned_cart_cart_status', $args['cart_status'] );
+		update_post_meta( $abandoned_cart_id, '_it_exchange_abandoned_cart_cart_value', $args['cart_value'] );
 		update_post_meta( $abandoned_cart_id, '_it_exchange_abandoned_cart_cart_id', $args['cart_id'] );
 
 		do_action( 'it_exchange_add_abandoned_cart_meta', $abandoned_cart_id, $user_id );
@@ -415,6 +420,9 @@ function it_exchange_get_abanonded_cart_status_label( $abandoned_cart ) {
 			break;
 		case 'expired' :
 			$label = __( 'Expired', 'LION' );
+			break;
+		case 'lost' :
+			$label = __( 'Lost', 'LION' );
 			break;
 		default:
 			$label = __( 'Unknown', 'LION' );

@@ -43,12 +43,18 @@ class IT_Exchange_Abandoned_Cart {
 	 * @var int $customer_id
 	*/
 	var $customer_id = false;
-	
+
 	/**
 	 * Abandoned Cart Status
 	 * @var string $cart_status
 	*/
 	var $cart_status = 'abandoned';
+
+	/**
+	 * Abandoned Cart Value
+	 * @var string $cart_value
+	*/
+	var $cart_value;
 
 	/**
 	 * Emails Sent. Array of email_id => time_sent
@@ -88,6 +94,7 @@ class IT_Exchange_Abandoned_Cart {
 		// Populate core postmeta
 		$this->customer_id = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_customer_id', true );
 		$this->cart_status = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_cart_status', true );
+		$this->cart_value  = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_cart_value', true );
 		$this->emails_sent = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_emails_sent', true );
 		do_action( 'it_exchange_abandoned_cart_populate_post_meta_object_properties', $this->ID );
 	}

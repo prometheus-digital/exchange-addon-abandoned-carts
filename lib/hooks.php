@@ -7,7 +7,7 @@
  * @return void
 */
 function it_exchange_abandoned_carts_bump_active_shopper( $customer, $cart_data ) {
-	// If user deleted cart, remove them as a qualified shopper
+	// If user deleted cart, remove them as a qualified shopper and mark the cart as lost.
 	if ( empty( $cart_data['products'] ) ) {
 		it_exchange_abandoned_carts_delete_last_qualified_activity_for_user( $customer->id );
 		return;
@@ -246,8 +246,6 @@ add_action( 'wp', 'it_exchange_abandoned_carts_handle_opened_email_ping' );
 /**
  * Register a click through for an email.
  *
- * Marks the abandoned cart as 'reengaged' but not recovered
- *
  * @since 1.0.0
  *
  * @return void
@@ -268,3 +266,25 @@ function it_exchange_abandoned_carts_handle_email_clickthrough() {
 	die();
 }
 add_action( 'wp', 'it_exchange_abandoned_carts_handle_email_clickthrough' );
+
+/**
+ * Mark an abandoned cart as lost if it is emptied
+ *
+ * @since 1.0.0
+ *
+ * @return void
+*/
+function it_exchange_mark_abandoned_cart_as_lost( $session_data_before_emptied ) {
+	$cart_id = empty( $session_data_before_emptied['cart_id'][0] ) ? false : $session_data_before_emptied['cart_id'][0];
+	if ( empty( $cart_id ) )
+		return;
+
+	$carts = it_exchange_get_abandoned_carts( array( 'cart_id' => $cart_id, 'cart_status' => 'any' ) );
+	foreach( $carts as $cart ) {
+		if ( ! empty( $cart->cart_id ) && $cart->cart_id == $cart_id ) {
+			update_post_meta( $cart->ID, '_it_exchange_abandoned_cart_cart_status', 'lost' );
+			break;
+		}
+	}
+}
+add_action( 'it_exchange_before_empty_shopping_cart', 'it_exchange_mark_abandoned_cart_as_lost', 10, 1 );

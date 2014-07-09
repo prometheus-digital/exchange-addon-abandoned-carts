@@ -257,7 +257,7 @@ class IT_Exchange_Abandoned_Cart_Post_Type {
 				echo implode( $emails_sent, '<br />' );
 				break;
 			case 'it_exchange_abandoned_cart_total_column' :
-				esc_attr_e( it_exchange_get_cart_total( true, array( 'use_cached_customer_cart' => $abandoned_cart->customer_id ) ) );
+				esc_attr_e( $abandoned_cart->cart_value );
 				break;
 		}
 	}
