@@ -138,21 +138,21 @@ function it_exchange_abdandoned_carts_insert_custom_dashboard( $incoming_from_wp
 	<div class="it-exchange-abandoned-carts-dashboard">
 		<div class="abandoned-carts-overview">
 			<div class="abandoned-carts-overview-items">
+				<div class="overview-item overview-item-abandoned">
+					<div class="overview-item-value"><?php echo it_exchange_get_number_of_abandoned_carts(); ?></div>
+					<div class="overview-item-title">Abandoned Carts</div>
+				</div>
 				<div class="overview-item overview-item-recovered-carts">
-					<div class="overview-item-value">27</div>
+					<div class="overview-item-value"><?php echo it_exchange_get_number_of_recovered_abandon_carts(); ?></div>
 					<div class="overview-item-title">Recovered Carts</div>
 				</div>
 				<div class="overview-item overview-item-recovered-revenue">
-					<div class="overview-item-value">$4,360.20</div>
-					<div class="overview-item-title">Recovered Revenue</div>
-				</div>
-				<div class="overview-item overview-item-conversion">
-					<div class="overview-item-value">15%</div>
+					<div class="overview-item-value"><?php echo it_exchange_get_value_of_recovered_abandon_carts(); ?></div>
 					<div class="overview-item-title">Recovered Revenue</div>
 				</div>
 				<div class="overview-item overview-item-average-value">
-					<div class="overview-item-value">$161.48</div>
-					<div class="overview-item-title">Average Recovered Value</div>
+					<div class="overview-item-value"><?php echo it_exchange_get_average_value_of_recovered_abandon_carts(); ?></div>
+					<div class="overview-item-title">Average Recovered Cart Value</div>
 				</div>
 			</div>
 		</div>

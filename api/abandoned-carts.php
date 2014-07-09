@@ -594,6 +594,73 @@ function it_exchange_get_abandoned_cart_email_clickthrough_rate( $email_id ) {
 	return empty( $percentage )? 0 . '%' : $percentage . '%';
 }
 
+/**
+ * Returns the total number of abandoned carts
+ *
+ * @since 1.0.0
+ *
+ * @return int
+*/
+function it_exchange_get_number_of_abandoned_carts() {
+	$carts = it_exchange_get_abandoned_carts( array( 'cart_status' => 'abandoned' ) );
+	return count( $carts );
+}
+
+/**
+ * Returns the total number of recovered carts
+ *
+ * @since 1.0.0
+ *
+ * @return int
+*/
+function it_exchange_get_number_of_recovered_abandon_carts() {
+	$carts = it_exchange_get_abandoned_carts( array( 'cart_status' => 'recovered' ) );
+	return count( $carts );
+}
+
+/**
+ * Returns the total value number of recovered carts
+ *
+ * @since 1.0.0
+ *
+ * @return int
+*/
+function it_exchange_get_value_of_recovered_abandon_carts( $format_price=true ) {
+	$carts = it_exchange_get_abandoned_carts( array( 'cart_status' => 'recovered' ) );
+	$value = 0;
+	foreach( $carts as $cart ) {
+		$cart_value = it_exchange_convert_to_database_number( $cart->cart_value );
+		$value      = $value + $cart_value;
+	}
+
+	$value = it_exchange_convert_from_database_number( $value );
+
+	return empty( $format_price ) ? $value : it_exchange_format_price( $value );
+}
+
+/**
+ * Returns the average total value number of recovered carts
+ *
+ * @since 1.0.0
+ *
+ * @return int
+*/
+function it_exchange_get_average_value_of_recovered_abandon_carts( $format_price=true ) {
+	$carts     = it_exchange_get_abandoned_carts( array( 'cart_status' => 'recovered' ) );
+	$num_carts = count( $carts );
+	$value     = 0;
+	foreach( $carts as $cart ) {
+		$cart_value = it_exchange_convert_to_database_number( $cart->cart_value );
+		$value      = $value + $cart_value;
+	}
+
+	$value = it_exchange_convert_from_database_number( $value );
+
+	$average = empty( $value ) || empty( $num_carts ) ? 0 : $value/$num_carts;
+
+	return empty( $format_price ) ? $average : it_exchange_format_price( $average );
+}
+
 function debug_abandoned_carts() {
 	if ( is_admin() )
 		return;
