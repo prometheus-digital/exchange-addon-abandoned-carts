@@ -73,10 +73,11 @@ function it_exchange_get_abandoned_carts( $args=array() ) {
 function it_exchange_get_abandoned_cart( $post ) {
     $abandoned_cart = new IT_Exchange_Abandoned_Cart( $post );
     if ( $abandoned_cart->ID ) {
-		$abandoned_cart->customer_id = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_customer_id', true );
-		$abandoned_cart->emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', true );
-		$abandoned_cart->cart_status = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_status', true );
-		$abandoned_cart->cart_id     = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_id', true );
+		$abandoned_cart->customer_id       = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_customer_id', true );
+		$abandoned_cart->emails_sent       = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', true );
+		$abandoned_cart->cart_status       = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_status', true );
+		$abandoned_cart->cart_id           = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_id', true );
+		$abandoned_cart->conversion_source = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_conversion_source', true );
         return apply_filters( 'it_exchange_get_abandoned_cart', $abandoned_cart, $post );
 	}
     return apply_filters( 'it_exchange_get_abandoned_cart', false, $post );
@@ -419,8 +420,8 @@ function it_exchange_get_abanonded_cart_status_label( $abandoned_cart ) {
 		case 'reengaged' :
 			$label = __( 'Reengaged', 'LION' );
 			break;
-		case 'reclaimed' :
-			$label = __( 'Reclaimed', 'LION' );
+		case 'recovered' :
+			$label = __( 'Recovered', 'LION' );
 			break;
 		case 'expired' :
 			$label = __( 'Expired', 'LION' );
@@ -491,6 +492,10 @@ function it_exchange_abandoned_carts_mark_email_opened( $email_id, $cart_id ) {
 	// If we made it this far the abadoned cart's sent_email has been flagged as open and we need to increment the opens for the email.
 	$opened = (int) get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_opened', true );
 	update_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_opened', ( $opened + 1 ) );
+
+	// Lets also credit any future purchases to this email
+	update_post_meta( $cart_id, '_it_exchange_abandoned_cart_conversion_source', $email_id );
+
 }
 
 /**
@@ -509,6 +514,24 @@ function it_exchange_get_abandoned_cart_email_opened_rate( $email_id ) {
 	$percentage = empty( $opened ) || empty( $sent ) ? 0 : $opened/$sent*100;
 	return empty( $percentage )? 0 . '%' : $percentage . '%';
 }
+
+/**
+ * Returns the number of times a specific email has been converted into a sell.
+ *
+ * @since 1.0.0
+ *
+ * @param int $email_id the wp post id for the email
+ *
+ * @return int
+*/
+function it_exchange_get_abandoned_cart_email_recovered_rate( $email_id ) {
+	$recovered = (int) get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_recovered', true );
+	$sent      = it_exchange_get_abandoned_cart_email_times_sent( $email_id );
+
+	$percentage = empty( $recovered ) || empty( $sent ) ? 0 : $recovered/$sent*100;
+	return empty( $percentage )? 0 . '%' : $percentage . '%';
+}
+
 
 /**
  * Generate the reclaim link for a specific email

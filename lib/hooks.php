@@ -1,5 +1,5 @@
 <?php
-/** 
+/**
  * Whenever a cart is cached, confirm it has products and add, update, or delete its status
  *
  * @since 1.0.0
@@ -175,7 +175,7 @@ add_filter( 'views_edit-it_ex_abandond_email', 'it_exchange_abdandoned_carts_ins
 add_filter( 'views_edit-it_ex_abandond_carts_dashboard', 'it_exchange_abdandoned_carts_insert_custom_dashboard' );
 add_filter( 'views_edit-it_ex_abandond_carts_settings', 'it_exchange_abdandoned_carts_insert_custom_dashboard' );
 
-/**  
+/**
  * Opens the iThemes Exchange Admin Menu when viewing the Add Cart and Email pages
  *
  * @since Changeme
@@ -290,3 +290,29 @@ function it_exchange_mark_abandoned_cart_as_lost( $session_data_before_emptied )
 /** @todo  Introduce more statuses in later version
 add_action( 'it_exchange_before_empty_shopping_cart', 'it_exchange_mark_abandoned_cart_as_lost', 10, 1 );
 */
+
+/**
+ * Mark an abandoned cart as recovered on checkout
+ *
+ * @since 1.0.0
+ *
+ * @return void
+*/
+function it_exchange_maybe_mark_abandoned_cart_as_recovered( $transaction_id ) {
+    $transaction = it_exchange_get_transaction( $transaction_id );
+	$cart_id     = empty( $transaction->cart_details->cart_id ) ? false : $transaction->cart_details->cart_id;
+	$user_id     = empty( $transaction->customer_id ) ? false : $transaction->customer_id;
+
+	$abandoned_carts = it_exchange_get_abandoned_carts( array( 'cart_id' => $cart_id ) );
+	$abandoned_cart  = empty( $abandoned_carts[0] ) ? false : $abandoned_carts[0];
+
+	if ( $abandoned_cart->cart_status != 'recovered' ) {
+		update_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_status', 'recovered' );
+
+		// If recovered source is an email, bump the number of converted for that email.
+		$source = empty( $abandoned_cart->conversion_source ) ? false : $abandoned_cart->conversion_source;
+		$current_count = get_post_meta( $source, '_it_exchange_abandoned_cart_emails_recovered', true );
+		update_post_meta( $source, '_it_exchange_abandoned_cart_emails_recovered', ( $current_count + 1 ) );
+	}
+}
+add_action( 'it_exchange_add_transaction_success', 'it_exchange_maybe_mark_abandoned_cart_as_recovered', 10, 1 );
