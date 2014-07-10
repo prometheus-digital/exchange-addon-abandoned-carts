@@ -65,3 +65,25 @@ function ithemes_exchange_addon_abandoned_carts_updater_register( $updater ) {
 }
 add_action( 'ithemes_updater_register', 'ithemes_exchange_addon_abandoned_carts_updater_register' );
 require( dirname( __FILE__ ) . '/lib/updater/load.php' );
+
+/**
+ * Activation hook. Runs on activation
+ *
+ * @since 1.0.0
+*/
+function it_exchange_abandoned_carts_activation_hook() {
+	// Setup cron on activation
+	wp_schedule_event( time(), 'hourly', 'it_exchange_abandoned_carts_hourly_event_hook' );
+}
+register_activation_hook( __FILE__, 'it_exchange_abandoned_carts_activation_hook' );
+
+/**
+ * Deactivation hook. Runs on deactivation
+ *
+ * @since 1.0.0
+*/
+function it_exchange_abandoned_carts_deactivation_hook() {
+	// clear cron on deactivation
+	wp_clear_scheduled_hook( 'it_exchange_abandoned_carts_hourly_event_hook' );
+}
+register_deactivation_hook( __FILE__, 'it_exchange_abandoned_carts_deactivation_hook' );
