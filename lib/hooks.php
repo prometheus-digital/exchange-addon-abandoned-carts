@@ -61,10 +61,13 @@ add_action( 'admin_print_scripts', 'it_exchange_abandoned_carts_register_scripts
 function it_exchange_abandoned_carts_add_admin_menu_item() {
 	$admin_menu_capability = apply_filters( 'it_exchange_abandoned_carts_admin_menu_cap', 'activate_plugins' );
 
+	/**
+	 * Don't need settings yet
 	if( ! empty( $_GET['page'] ) && 'it-exchange-abandoned-carts-settings' == $_GET['page'] )
 		add_submenu_page( 'it-exchange', __( 'Abandoned Carts Settings', 'LION' ), __( 'Abandoned Carts', 'LION' ), $admin_menu_capability, 'it-exchange-abandoned-carts-settings', 'it_exchange_abandoned_carts_print_settings_page' );
 	else
-		add_submenu_page( 'it-exchange', __( 'Abandoned Carts Dashboard', 'LION' ), __( 'Abandoned Carts', 'LION' ), $admin_menu_capability, 'it-exchange-abandoned-carts-dashboard', 'it_exchange_abandoned_carts_print_dashboard_page' );
+	*/
+	add_submenu_page( 'it-exchange', __( 'Abandoned Carts Dashboard', 'LION' ), __( 'Abandoned Carts', 'LION' ), $admin_menu_capability, 'it-exchange-abandoned-carts-dashboard', 'it_exchange_abandoned_carts_print_dashboard_page' );
 }
 add_action( 'admin_menu', 'it_exchange_abandoned_carts_add_admin_menu_item' );
 
@@ -120,8 +123,11 @@ function it_exchange_abdandoned_carts_insert_custom_dashboard( $incoming_from_wp
 		$current_tab = 'carts';
 	if ( ! empty( $_GET['post_type'] ) && 'it_ex_abandond_email' == $_GET['post_type'] )
 		$current_tab = 'emails';
+	/**
+	 * Don't need settings yet
 	if ( ! empty( $_GET['page'] ) && 'it-exchange-abandoned-carts-settings' == $_GET['page'] )
 		$current_tab = 'settings';
+	*/
 	?>
 	<div class="it-exchange-abandoned-carts-dashboard">
 		<div class="abandoned-carts-overview">
@@ -149,7 +155,11 @@ function it_exchange_abdandoned_carts_insert_custom_dashboard( $incoming_from_wp
 			<a class="nav-tab <?php echo ($current_tab == 'dashboard' ) ? 'nav-tab-active' : '';?>" href="<?php echo admin_url( 'admin.php?page=it-exchange-abandoned-carts-dashboard' ); ?>"><?php _e( 'Dashboard', 'LION' ); ?></a>
 			<a class="nav-tab <?php echo ($current_tab == 'carts' ) ? 'nav-tab-active' : '';?>" href="<?php echo admin_url( 'edit.php?post_type=it_ex_abandoned' ); ?>"><?php _e( 'Carts', 'LION' ); ?></a>
 			<a class="nav-tab <?php echo ($current_tab == 'emails' ) ? 'nav-tab-active' : '';?>" href="<?php echo admin_url( 'edit.php?post_type=it_ex_abandond_email' ); ?>"><?php _e( 'Email Templates', 'LION' ); ?></a>
+			<?php
+			/**
+			 * Don't need settings yet
 			<a class="nav-tab <?php echo ($current_tab == 'settings' ) ? 'nav-tab-active' : '';?>" href="<?php echo admin_url( 'admin.php?page=it-exchange-abandoned-carts-settings' ); ?>"><?php _e( 'Settings', 'LION' ); ?></a>
+			*/ ?>
 			</h3>
 		</div>
 
