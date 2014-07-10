@@ -270,7 +270,7 @@ function it_exchange_abandoned_carts_get_abandonment_emails() {
 		$subject         = get_the_title( $template->ID );
 		$temp            = $GLOBALS['post'];
 		$GLOBALS['post'] = $template;
-		$message         = apply_filters( 'the_content', $template->post_content );
+		$message         = $template->post_content;
 		$GLOBALS['post'] = $temp;
 		$scheduling      = get_post_meta( $template->ID, '_it_exchange_abandoned_cart_emails_scheduling_unix', true );
 
@@ -301,18 +301,25 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 	$emails = it_exchange_abandoned_carts_get_abandonment_emails();
 	$email  = isset( $emails[$email_id] ) ? $emails[$email_id] : false;
 
+	// Get the user for the email
+	$user = get_userdata( $abandoned_cart->customer_id );
+
+	// Setup globals for Shortcodes and apply the_content
+	$GLOBALS['it_exchange']['abandoned_carts']['shortcode_data'] = array(
+		'customer_name'  => empty( $user->data->display_name ) ?  __( 'Customer', 'LION' ) : $user->data->display_name,
+		'cart_link_href' => it_exchange_generate_reclaim_link_for_abandoned_email( $email_id, $abandoned_cart->ID ),
+	);
+	$email['content'] = apply_filters( 'the_content', $email['content'] );
+	unset( $GLOBALS['it_exchange']['abandoned_carts']['shortcode_data'] );
+
 	// Make sure we found the email we're looking for.
 	if ( empty( $email ) )
 		return false;
-
-	// Temp Add Tracking code here
-	$email['content'] .= '<a href="' . it_exchange_generate_reclaim_link_for_abandoned_email( $email_id, $abandoned_cart->ID ) . '">' . __( 'Finish Shopping', 'LION' ) . '</a>';
 
 	// Add tracking code
 	$email['content'] .= '<img src="' . add_query_arg( array( 'it-exchange-cart-summary' => $email_id . '-'  . $abandoned_cart->ID ), get_home_url() )  . '" width="1" height="1" />';
 
 	// Send the email
-	$user = get_userdata( $abandoned_cart->customer_id );
 	if ( ! empty( $user->data->user_email ) ) {
 		add_filter( 'wp_mail_content_type', 'it_exchange_abandoned_cart_set_email_content_type' );
 		wp_mail( $user->data->user_email, $email['subject'], $email['content'] );

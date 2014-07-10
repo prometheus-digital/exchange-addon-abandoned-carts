@@ -418,3 +418,27 @@ function it_exchange_get_abandoned_carts_stats() {
 	}
 }
 add_action( 'wp_ajax_ithemes_exchange_abandoned_carts_data', 'it_exchange_get_abandoned_carts_stats' );
+
+/**
+ * Register our shortcodes for the abandoned cart emails
+ *
+ * @since 1.0.0
+ *
+ * @param array $atts
+ * @return string
+*/
+function it_exchange_abandoned_carts_do_email_shortcodes( $atts=array() ) {
+	$display = empty( $atts['display'] ) ? false : $atts['display'];
+	$return = '';
+	$subs = $GLOBALS['it_exchange']['abandoned_carts']['shortcode_data'];
+	switch ( $display ) {
+		case 'customer_name' :
+			$return = empty( $subs['customer_name'] ) ? __( 'Valued Customer', 'LION' ) : $subs['customer_name'];
+			break;
+		case 'cart_link_href' :
+			$return = empty( $subs['cart_link_href'] ) ? '' : $subs['cart_link_href'];
+			break;
+	}
+	return $return;
+}
+add_shortcode( 'exchange-abandoned-carts', 'it_exchange_abandoned_carts_do_email_shortcodes' );
