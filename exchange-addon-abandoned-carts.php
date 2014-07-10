@@ -74,6 +74,7 @@ require( dirname( __FILE__ ) . '/lib/updater/load.php' );
 function it_exchange_abandoned_carts_activation_hook() {
 	// Setup cron on activation
 	wp_schedule_event( time(), 'hourly', 'it_exchange_abandoned_carts_hourly_event_hook' );
+	update_option( 'it-exchange-create-abandoned-cart-demo-email', true );
 }
 register_activation_hook( __FILE__, 'it_exchange_abandoned_carts_activation_hook' );
 

@@ -256,13 +256,14 @@ function it_exchange_add_abandoned_cart( $user_id, $args=array() ) {
  * @since 1.0.0
  * @return array
 */
-function it_exchange_abandoned_carts_get_abandonment_emails() {
+function it_exchange_abandoned_carts_get_abandonment_emails( $args=array() ) {
 
-	$args = array(
+	$defaults = array(
 		'post_type'      => 'it_ex_abandond_email',
 		'post_status'    => 'publish',
 		'posts_per_page' => -1,
 	);
+	$args = wp_parse_args( $args, $defaults );
 	$email_templates = get_posts( $args );
 
 	$emails = array();

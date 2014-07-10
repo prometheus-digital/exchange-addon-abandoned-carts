@@ -442,3 +442,49 @@ function it_exchange_abandoned_carts_do_email_shortcodes( $atts=array() ) {
 	return $return;
 }
 add_shortcode( 'exchange-abandoned-carts', 'it_exchange_abandoned_carts_do_email_shortcodes' );
+
+/**
+ * Add Example email if not already created
+ *
+ * @since 1.0.0
+ *
+ * @return void
+*/
+function it_exchange_abandoned_cart_emails_create_example_email() {
+	$emails = it_exchange_abandoned_carts_get_abandonment_emails( array( 'post_status' => 'any' ) );
+	if ( ! empty( $emails ) )
+		return;
+
+	$args = array(
+		'post_type'    => 'it_ex_abandond_email',
+		'post_status'  => 'draft',
+		'post_title'   => __( 'You Forgot Something Awesome!', 'LION' ),
+		'post_content' => 'Hi [exchange-abandoned-carts display="customer_first_name"],
+<p>Your shopping cart at [exchange-abandoned-carts display="store_name"] has been reserved and is waiting for your return!</p>
+<p>In your cart, you left ...<br />
+[exchange-abandoned-carts display="cart_products"]
+</p>
+<p>Is there anything holding you back from making your purchase today? We\'re here to help. If you have any questions, just reply back to this email.</p>
+<p>Your Friends at [exchange-abandoned-carts display="store_name"]</p>'
+	);
+
+	if ( $id = wp_insert_post( $args ) ) {
+		update_post_meta( $id, '_it_exchange_abandoned_cart_emails_scheduling_unix', 3600 );
+		update_post_meta( $id, '_it_exchange_abandoned_cart_emails_scheduling', array( 'int' => 1, 'unit' => 'hours' ) );
+	}
+}
+
+/**
+ * Creates the demo email on plugin activation
+ *
+ * @since 1.0.0
+ *
+ * @return void
+*/
+function it_exchange_maybe_create_demo_abandon_email() {
+	if ( false != get_option( 'it-exchange-create-abandoned-cart-demo-email' ) ) {
+		it_exchange_abandoned_cart_emails_create_example_email();
+		delete_option( 'it-exchange-create-abandoned-cart-demo-email' );
+	}
+}
+add_action( 'admin_init', 'it_exchange_maybe_create_demo_abandon_email' );
