@@ -85,18 +85,6 @@ function it_exchange_abandoned_carts_print_dashboard_page() {
 			<h3><?php _e( 'Recovered Carts', 'LION' ); ?></h3>
 			<canvas id="it-exchange-abandoned-cart-overview-chart"></canvas>
 		</div>
-		<div class="overview-chart">
-			<h3><?php _e( 'Recovered Carts', 'LION' ); ?></h3>
-			<canvas id="it-exchange-abandoned-cart-overview-chart"></canvas>
-		</div>
-		<div class="overview-chart">
-			<h3><?php _e( 'Recovered Carts', 'LION' ); ?></h3>
-			<canvas id="it-exchange-abandoned-cart-overview-chart"></canvas>
-		</div>
-		<div class="overview-chart">
-			<h3><?php _e( 'Recovered Carts', 'LION' ); ?></h3>
-			<canvas id="it-exchange-abandoned-cart-overview-chart"></canvas>
-		</div>
 	</div>
 	<?php
 }
@@ -316,3 +304,36 @@ function it_exchange_maybe_mark_abandoned_cart_as_recovered( $transaction_id ) {
 	}
 }
 add_action( 'it_exchange_add_transaction_success', 'it_exchange_maybe_mark_abandoned_cart_as_recovered', 10, 1 );
+
+/**
+ * Returns JSON formatted data for wp-ajax
+ *
+ * @since 1.0.0
+ *
+ * @return string
+*/
+function it_exchange_get_abandoned_carts_stats() {
+	$stat_type = empty( $_POST['iteac_stat'] ) ? false : $_POST['iteac_stat'];
+	if ( empty( $stat_type ) )
+		return;
+
+	if ( 'carts' == $stat_type ) {
+
+		$raw_stats = it_exchange_abandoned_carts_get_abandoned_carts_by_day();
+		$raw_stats = array_reverse( $raw_stats, true );
+
+		$carts = new stdClass();
+		$carts->fillColor = '#d1ebb0';
+		$carts->strokeColor = '#89c43d';
+		$carts->pointColor = '#89c43d';
+		$carts->pointStrokeColor = '#ffffff';
+		$carts->data = array_values( $raw_stats );
+
+		$stats = new stdClass();
+		$stats->labels   = array_keys( $raw_stats );
+		$stats->datasets = array( $carts );
+
+		die( json_encode( $stats ) );
+	}
+}
+add_action( 'wp_ajax_ithemes_exchange_abandoned_carts_data', 'it_exchange_get_abandoned_carts_stats' );

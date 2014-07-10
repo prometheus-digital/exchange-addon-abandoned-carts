@@ -545,7 +545,7 @@ function it_exchange_get_abandoned_cart_email_recovered_rate( $email_id ) {
 function it_exchange_generate_reclaim_link_for_abandoned_email( $email_id, $cart_id ) {
 	$rmd5             = md5( rand() );
 	$obfuscation_ftw  = substr( $rmd5, 0, 1 );
-	$obfuscation_ftw .= '-' . substr( $rmd5, 1, 7 ) . $email_id . substr( $rmd5, 8, 5 ); 
+	$obfuscation_ftw .= '-' . substr( $rmd5, 1, 7 ) . $email_id . substr( $rmd5, 8, 5 );
 	$obfuscation_ftw .= '-' . substr( $rmd5, 13, 4 );
 	$obfuscation_ftw .= '-' . $cart_id . substr( $rmd5, 17, 3 );
 	$obfuscation_ftw .= '-' . substr( $rmd5, 20 );
@@ -602,7 +602,7 @@ function it_exchange_get_abandoned_cart_email_clickthrough_rate( $email_id ) {
  * @return int
 */
 function it_exchange_get_number_of_abandoned_carts() {
-	$carts = it_exchange_get_abandoned_carts( array( 'cart_status' => 'abandoned' ) );
+	$carts = it_exchange_get_abandoned_carts( array( 'cart_status' => 'any' ) );
 	return count( $carts );
 }
 
@@ -659,6 +659,27 @@ function it_exchange_get_average_value_of_recovered_abandon_carts( $format_price
 	$average = empty( $value ) || empty( $num_carts ) ? 0 : $value/$num_carts;
 
 	return empty( $format_price ) ? $average : it_exchange_format_price( $average );
+}
+
+/**
+ * Returns stats grouped by day
+ *
+ * @since 1.0.0
+ *
+ * @return array
+*/
+function it_exchange_abandoned_carts_get_abandoned_carts_by_day() {
+	$carts = it_exchange_get_abandoned_carts( array( 'cart_status' => 'recovered', 'posts_per_page' => -1 ) );
+
+	$stats = array();
+	foreach( (array) $carts as $cart ) {
+		$date = get_the_date( '', $cart->ID );
+		if ( empty( $stats[$date] ) )
+			$stats[$date] = 1;
+		else
+			$stats[$date] = $stats[$date] + 1;
+	}
+	return $stats;
 }
 
 function debug_abandoned_carts() {
