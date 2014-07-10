@@ -360,7 +360,10 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	function print_abandoned_cart_email_shortcodes_metabox( $post ) {
 		do_action( 'it_exchange_before_abandoned_cart_shortcodes' );
 		?>
-		<p>Shortcode Reference goes here!!</p>
+		<p><strong>Use the following shortcodes in your email template</strong></p>
+		<hr />
+		<p><pre>[exchange-abandoned-carts display="customer_name"]</pre><?php _e( 'Replaced with the customer\'s WordPress display name. Should be first and last name if registered through Exchange', 'LION' ); ?><br /><br /></p><hr />
+		<p><pre>[exchange-abandoned-carts display="cart_link_href"]</pre><?php _e( 'Replaced with a unique URL for each customer\'s cart. Use inside the href tag of a link.', 'LION' ); ?><br /><br /></p>
 		<?php
 	}
 }
