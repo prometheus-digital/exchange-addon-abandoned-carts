@@ -326,22 +326,25 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	function print_abandoned_cart_email_scheduling_metabox( $post ) {
 		do_action( 'it_exchange_before_abandoned_cart_scheduling' );
 		$human_readable = get_post_meta( $post->ID, '_it_exchange_abandoned_cart_emails_scheduling', true );
-		$selected_int   = empty( $human_readable['int'] ) ? 30 : $human_readable['int'];
-		$selected_unit  = empty( $human_readable['unit'] ) ? 'minutes' : $human_readable['unit'];
+		$selected_int   = empty( $human_readable['int'] ) ? 1 : $human_readable['int'];
+		$selected_unit  = empty( $human_readable['unit'] ) ? 'hours' : $human_readable['unit'];
 		?>
 		<p><?php _e( 'How long should we wait to send this email after a customer abandons their cart?', 'LION' ); ?></p>
 		<select name="it-exchange-abandonded-cart-emails-scheduling[int]">
 		<?php
-		for( $i=1;$i<=59;$i++ ) { 
+		$ceiling = apply_filters( 'it_exchange_abandoned_carts_allow_minutes_in_schedule', false ) ? 59 : 23;
+		for( $i=1;$i<=$ceiling;$i++ ) { 
 			?><option value="<?php echo $i; ?>" <?php selected( $i, $selected_int ); ?>><?php echo $i; ?></option><?php
 		}
 		?>
 		</select>
 		<select name="it-exchange-abandonded-cart-emails-scheduling[unit]">
+			<?php if ( apply_filters( 'it_exchange_abandoned_carts_allow_minutes_in_schedule', false ) ) : ?>
 			<option value="minutes" <?php selected( 'minutes', $selected_unit ); ?>><?php _e( 'minutes', 'LION' ); ?></option>
-			<option value="hours" <?php selected( 'hours', $selected_unit ); ?>><?php _e( 'hours', 'LION' ); ?></option>
-			<option value="days" <?php selected( 'days', $selected_unit ); ?>><?php _e( 'days', 'LION' ); ?></option>
-			<option value="weeks" <?php selected( 'weeks', $selected_unit ); ?>><?php _e( 'weeks', 'LION' ); ?></option>
+			<?php endif; ?>
+			<option value="hours" <?php selected( 'hours', $selected_unit ); ?>><?php _e( 'hour(s)', 'LION' ); ?></option>
+			<option value="days" <?php selected( 'days', $selected_unit ); ?>><?php _e( 'day(s)', 'LION' ); ?></option>
+			<option value="weeks" <?php selected( 'weeks', $selected_unit ); ?>><?php _e( 'week(s)', 'LION' ); ?></option>
 		</select>
 		<input type="hidden" name="it-exchange-abandonded-cart-emails-scheduling[updating]" value="1" />
 		<?php
