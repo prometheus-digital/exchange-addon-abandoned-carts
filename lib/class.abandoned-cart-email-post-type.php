@@ -363,6 +363,10 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		<p><strong>Use the following shortcodes in your email template</strong></p>
 		<hr />
 		<p><pre>[exchange-abandoned-carts display="customer_name"]</pre><?php _e( 'Replaced with the customer\'s WordPress display name. Should be first and last name if registered through Exchange', 'LION' ); ?><br /><br /></p><hr />
+		<p><pre>[exchange-abandoned-carts display="customer_first_name"]</pre><?php _e( 'Replaced with the customer\'s first name. Uses "Customer" if blank.', 'LION' ); ?><br /><br /></p><hr />
+		<p><pre>[exchange-abandoned-carts display="customer_last_name"]</pre><?php _e( 'Replaced with the customer\'s last name if available. Blank if not.', 'LION' ); ?><br /><br /></p><hr />
+		<p><pre>[exchange-abandoned-carts display="store_name"]</pre><?php _e( 'Replaced with the store name in General Settings of Exchange', 'LION' ); ?><br /><br /></p><hr />
+		<p><pre>[exchange-abandoned-carts display="cart_products"]</pre><?php _e( 'Replaced with a list of the products in the cart along with their prices.', 'LION' ); ?><br /><br /></p><hr />
 		<p><pre>[exchange-abandoned-carts display="cart_link_href"]</pre><?php _e( 'Replaced with a unique URL for each customer\'s cart. Use inside the href tag of a link.', 'LION' ); ?><br /><br /></p>
 		<?php
 	}
