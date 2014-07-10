@@ -63,49 +63,49 @@ function it_exchange_abandoned_carts_process_qualified_shoppers_queue() {
     $cart_abandonment_emails  = it_exchange_abandoned_carts_get_abandonment_emails();
 
     // Loop through all of our active carts
-    foreach( $qualified_shoppers_queue as $user_id => $last_active ) { 
+    foreach( $qualified_shoppers_queue as $user_id => $last_active ) {
         // If user has unsubscribed, don't send email @todo Maybe remove from qualified shoppers queue
         $unsubscribed = get_user_meta( $user_id, '_it_exchange_unsubscribed_from_abandoned_cart_emails', true );
-        if ( ! empty( $unsubscribed ) ) 
+        if ( ! empty( $unsubscribed ) )
             return;
 
         // Calculate how log it has been since this use was last active
         $time_since_last_activity = ($now - $last_active );
 
         // Loop through our possible emails sorted by last email to first
-        foreach( $cart_abandonment_emails as $email_id => $props ) { 
+        foreach( $cart_abandonment_emails as $email_id => $props ) {
             // Test to see if last email was beyond the timeframe for this email
-            if ( $time_since_last_activity >= $props['time'] ) { 
+            if ( $time_since_last_activity >= $props['time'] ) {
                 // Test to make sure the abandoned cart exists and has not received this email
-                if ( ! $abandoned_cart = it_exchange_get_active_abandoned_cart_for_user( $user_id ) ) { 
+                if ( ! $abandoned_cart = it_exchange_get_active_abandoned_cart_for_user( $user_id ) ) {
                     // Grab customer's current cached cart id
                     $cached_cart       = it_exchange_get_cached_customer_cart( $user_id );
                     $cached_cart_id    = empty( $cached_cart['cart_id'][0] ) ? false : $cached_cart['cart_id'][0];
                     $cached_cart_value = it_exchange_get_cart_total( true, array( 'use_cached_customer_cart' => $user_id ) );
 
                     $abandoned_cart = it_exchange_add_abandoned_cart( $user_id, array( 'cart_id' => $cached_cart_id, 'cart_value' => $cached_cart_value ) );
-                }   
+                }
 
                 // Test to make sure abandoned cart hasn't already sent this email
                 $emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', true );
 
                 // Loop through sent emails and make sure that this email hasn't been sent already.
                 $email_already_sent = false;
-                foreach( (array) $abandoned_cart->emails_sent as $email ) { 
-                    if ( empty( $email['email_id'] ) ) 
+                foreach( (array) $abandoned_cart->emails_sent as $email ) {
+                    if ( empty( $email['email_id'] ) )
                         continue;
 
                     if ( $email['email_id'] == $email_id )
                         $email_already_sent = true;
-                }   
+                }
                 // Send it if it hasn't been sent
-                if (  empty( $email_already_sent ) ) { 
+                if (  empty( $email_already_sent ) ) {
                     it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $email_id );
-                }   
+                }
                 break 1;
-            }   
-        }   
-    }   
+            }
+        }
+    }
 }
 add_action( 'it_exchange_abandoned_carts_hourly_event_hook', 'it_exchange_abandoned_carts_process_qualified_shoppers_queue' );
 
@@ -144,6 +144,19 @@ function it_exchange_abandoned_carts_print_dashboard_page() {
 
 		<div class="overview-chart clear">
 			<h3><?php _e( 'Recovered Carts', 'LION' ); ?></h3>
+			<div class="no-recovered-carts hidden">
+				<p>
+				<?php
+				$num_abandoned_carts = it_exchange_get_number_of_abandoned_carts();
+				if ( empty( $num_abandoned_carts ) ) :
+					_e( 'You haven\'t had any abandoned carts yet. Congratulations!', 'LION' );
+				else :
+					printf( __( 'You have %s abandoned carts but haven\'t recovered any yet. Make sure youre %semails%s are setup correctly!', 'LION' ), $num_abandoned_carts, '<a href="' . admin_url( 'edit.php?post_type=it_ex_abandoned' ) . '">', '</a>' );
+				endif;
+				?>
+				</p>
+
+			</div>
 			<canvas id="it-exchange-abandoned-cart-overview-chart"></canvas>
 		</div>
 	</div>
