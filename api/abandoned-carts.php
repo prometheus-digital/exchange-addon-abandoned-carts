@@ -305,10 +305,32 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 	// Get the user for the email
 	$user = get_userdata( $abandoned_cart->customer_id );
 
+	// Get cached cart and set products if it matches
+	$cached_cart = it_exchange_get_cached_customer_cart( $abandoned_cart->customer_id );
+	$products    = array();
+	$cart_value  = empty( $abandoned_cart->cart_value ) ? false : $abandoned_cart->cart_value;
+	$first_name  = get_user_meta( $abandoned_cart->customer_id, 'first_name', true );
+	$last_name   = get_user_meta( $abandoned_cart->customer_id, 'last_name', true );
+
+	if ( ! empty( $cached_cart['cart_id'][0] ) && $cached_cart['cart_id'][0] == $abandoned_cart->cart_id ) {
+		if ( ! empty( $cached_cart['products'] ) ) {
+			foreach( (array) $cached_cart['products'] as $product ) {
+				$product_title = it_exchange_get_product_feature( $product['product_id'], 'title' );
+				$base_price = it_exchange_get_product_feature( $product['product_id'], 'base-price' );
+				if ( ! empty( $product_title ) )
+					$products[]  = array( 'title' => $product_title, 'price' => it_exchange_format_price( $base_price ) );
+			}
+		}
+	}
+
 	// Setup globals for Shortcodes and apply the_content
 	$GLOBALS['it_exchange']['abandoned_carts']['shortcode_data'] = array(
-		'customer_name'  => empty( $user->data->display_name ) ?  __( 'Customer', 'LION' ) : $user->data->display_name,
-		'cart_link_href' => it_exchange_generate_reclaim_link_for_abandoned_email( $email_id, $abandoned_cart->ID ),
+		'customer_name'       => empty( $user->data->display_name ) ?  __( 'Customer', 'LION' ) : $user->data->display_name,
+		'customer_first_name' => empty( $first_name ) ?  __( 'Customer', 'LION' ) : $first_name,
+		'customer_last_name'  => empty( $last_name ) ?  __( '', 'LION' ) : $last_name,
+		'cart_link_href'      => it_exchange_generate_reclaim_link_for_abandoned_email( $email_id, $abandoned_cart->ID ),
+		'cart_products'       => $products,
+		'cart_value'          => $cart_value,
 	);
 	$email['content'] = apply_filters( 'the_content', $email['content'] );
 	unset( $GLOBALS['it_exchange']['abandoned_carts']['shortcode_data'] );
@@ -631,12 +653,3 @@ function it_exchange_abandoned_carts_get_abandoned_carts_by_day() {
 	}
 	return $stats;
 }
-
-function debug_abandoned_carts() {
-	if ( is_admin() )
-		return;
-
-	$plugin_options = it_exchange_get_option( 'addon_abandoned_carts' );
-	ITUtility::print_r($plugin_options);
-}
-//add_action( 'wp_footer', 'debug_abandoned_cats' );

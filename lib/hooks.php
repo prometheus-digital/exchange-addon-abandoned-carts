@@ -435,8 +435,28 @@ function it_exchange_abandoned_carts_do_email_shortcodes( $atts=array() ) {
 		case 'customer_name' :
 			$return = empty( $subs['customer_name'] ) ? __( 'Valued Customer', 'LION' ) : $subs['customer_name'];
 			break;
+		case 'customer_first_name' :
+			$return = empty( $subs['customer_first_name'] ) ? __( 'Valued Customer', 'LION' ) : $subs['customer_first_name'];
+			break;
+		case 'customer_last_name' :
+			$return = empty( $subs['customer_last_name'] ) ? '' : $subs['customer_last_name'];
+			break;
 		case 'cart_link_href' :
 			$return = empty( $subs['cart_link_href'] ) ? '' : $subs['cart_link_href'];
+			break;
+		case 'cart_products' :
+			if ( empty( $subs['cart_products'] ) )
+				break;
+			foreach( (array) $subs['cart_products'] as $cart_product ) {
+				$return .= $cart_product['title'] . ': ' . $cart_product['price'] . '<br />';
+			}
+			break;
+		case 'cart_value' :
+			$return = empty( $subs['cart_value'] ) ? '' : $subs['cart_value'];
+			break;
+		case 'store_name' :
+			$options = it_exchange_get_option( 'settings_general' );
+			$return = empty( $options['company-name'] ) ? '' : $options['company-name'];
 			break;
 	}
 	return $return;
@@ -464,6 +484,7 @@ function it_exchange_abandoned_cart_emails_create_example_email() {
 <p>In your cart, you left ...<br />
 [exchange-abandoned-carts display="cart_products"]
 </p>
+<p>Here\'s a link to quickly get back to your cart<br /><a href="[exchange-abandoned-carts display=\'cart_link_href\']">Return to your cart</a></p>
 <p>Is there anything holding you back from making your purchase today? We\'re here to help. If you have any questions, just reply back to this email.</p>
 <p>Your Friends at [exchange-abandoned-carts display="store_name"]</p>'
 	);
