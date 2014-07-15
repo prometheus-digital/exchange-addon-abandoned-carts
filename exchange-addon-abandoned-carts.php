@@ -31,7 +31,7 @@ function it_exchange_register_abandoned_carts_addon() {
 		'description'       => __( 'Tracks abandoned carts and automatically emails customers.', 'LION' ),
 		'author'            => 'iThemes',
 		'author_url'        => 'http://ithemes.com/exchange/abandoned-carts/',
-		'icon'              => ITUtility::get_url_from_file( dirname( __FILE__ ) . '/abandoned-carts50px.png' ),
+		'icon'              => ITUtility::get_url_from_file( dirname( __FILE__ ) . '/lib/abandoned-carts50px.png' ),
 		'file'              => dirname( __FILE__ ) . '/init.php',
 		'settings-callback' => 'it_exchange_abandoned_carts_print_settings_page',
 		'category'          => 'admin',
