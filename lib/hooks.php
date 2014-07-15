@@ -374,6 +374,8 @@ function it_exchange_maybe_mark_abandoned_cart_as_recovered( $transaction_id ) {
 
 	$abandoned_carts = it_exchange_get_abandoned_carts( array( 'cart_id' => $cart_id ) );
 	$abandoned_cart  = empty( $abandoned_carts[0] ) ? false : $abandoned_carts[0];
+	if ( ! $abandoned_cart )
+		return;
 
 	if ( $abandoned_cart->cart_status != 'recovered' ) {
 		update_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_status', 'recovered' );
