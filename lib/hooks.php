@@ -18,7 +18,6 @@ function it_exchange_abandoned_carts_bump_active_shopper( $customer, $cart_data 
 	if ( ! $update_activity )
 		return;
 
-	it_hipchat_trace( 'bumpped' );
 	// Update their time stamp as a qualified shopper
 	it_exchange_abandoned_carts_update_last_qualified_activity_for_user( $customer->id );
 }
