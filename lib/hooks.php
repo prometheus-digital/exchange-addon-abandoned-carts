@@ -163,24 +163,6 @@ function it_exchange_abandoned_carts_print_dashboard_page() {
 	<?php
 }
 
-
-/**
- * Print the settings page
- *
- * @since 1.0.0
- *
- * @return void
-*/
-function it_exchange_abandoned_carts_print_settings_page() {
-	?>
-	<div class="wrap">
-		<h2><?php _e( 'Abandoned Carts Settings', 'LION' ); ?></h2>
-		<?php do_action( 'views_edit-it_ex_abandond_carts_settings', false ); ?>
-		<h3>-- Settings will go here --</h3>
-	</div>
-	<?php
-}
-
 /**
  * Add content to top of Abanded Carts Admin Page
  *
