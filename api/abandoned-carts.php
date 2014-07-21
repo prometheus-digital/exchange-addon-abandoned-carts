@@ -181,13 +181,6 @@ function it_exchange_abandoned_carts_update_last_qualified_activity_for_user( $c
 */
 function it_exchange_get_active_abandoned_cart_for_user( $customer_id ) {
 
-	/**
-	 * @todo THIS IS TEMP FOR TESTING. DELETE BEFORE RELEASE
-	*/
-	if ( ! $customer = it_exchange_get_customer( $customer_id ) )
-		return false;
-	// END TEMP
-
 	// Grab customer's current cached cart id
 	$cached_cart    = it_exchange_get_cached_customer_cart( $customer_id );
 	$cached_cart_id = empty( $cached_cart['cart_id'][0] ) ? false : $cached_cart['cart_id'][0];
