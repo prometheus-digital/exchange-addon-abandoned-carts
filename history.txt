@@ -1,0 +1,4 @@
+1.0.1 - 2014-07-22 - Glenn Ansley
+	Fix PHP Error showing up on first use.
+1.0.0 - 2014-07-21 - Glenn Ansley
+	Initial Release

@@ -94,7 +94,8 @@ function it_exchange_abandoned_carts_is_active_shopper() {
 		return false;
 
 	// We do not start tracking until they have an item in their cart
-	if ( empty( it_exchange_get_cart_products() ) )
+	$cart_products = it_exchange_get_cart_products();
+	if ( count( $cart_products ) < 1 )
 		return false;
 
 	// If user is logged in and has an item in their cart, this is an active shopper
