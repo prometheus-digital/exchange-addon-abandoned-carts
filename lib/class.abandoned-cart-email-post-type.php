@@ -289,6 +289,9 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		// Remove screen options tab
 		add_filter('screen_options_show_screen', '__return_false');
 
+		// Remove Builder Layoutmetabox
+		remove_meta_box( 'layout_meta_box', 'it_ex_abandond_email', 'side' );
+
 		// Cart Details
 		$title     = __( 'Scheduling', 'LION' );
 		$callback  = array( $this, 'print_abandoned_cart_email_scheduling_metabox' );
