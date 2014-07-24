@@ -478,7 +478,7 @@ function it_exchange_get_abandoned_cart_email_opened_rate( $email_id ) {
 	$sent   = it_exchange_get_abandoned_cart_email_times_sent( $email_id );
 
 	$percentage = empty( $opened ) || empty( $sent ) ? 0 : $opened/$sent*100;
-	return empty( $percentage )? 0 . '%' : $percentage . '%';
+	return empty( $percentage )? 0 . '%' : round( $percentage, 2 ) . '%';
 }
 
 /**
@@ -495,7 +495,7 @@ function it_exchange_get_abandoned_cart_email_recovered_rate( $email_id ) {
 	$sent      = it_exchange_get_abandoned_cart_email_times_sent( $email_id );
 
 	$percentage = empty( $recovered ) || empty( $sent ) ? 0 : $recovered/$sent*100;
-	return empty( $percentage )? 0 . '%' : $percentage . '%';
+	return empty( $percentage )? 0 . '%' : round( $percentage, 2 ) . '%';
 }
 
 
@@ -557,7 +557,7 @@ function it_exchange_get_abandoned_cart_email_clickthrough_rate( $email_id ) {
 	$sent           = it_exchange_get_abandoned_cart_email_times_sent( $email_id );
 
 	$percentage = empty( $clickedthrough ) || empty( $sent ) ? 0 : $clickedthrough/$sent*100;
-	return empty( $percentage )? 0 . '%' : $percentage . '%';
+	return empty( $percentage )? 0 . '%' : round( $percentage, 2 ) . '%';
 }
 
 /**
