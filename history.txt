@@ -1,3 +1,6 @@
+1.0.2 - 2014-07-24 - Glenn Ansley
+	Round Email opened, clickthrough, and conversion rates to 2 decimal places
+	Remove Builder Layout metabox from email add/edit screens
 1.0.1 - 2014-07-22 - Glenn Ansley
 	Fix PHP Error showing up on first use.
 1.0.0 - 2014-07-21 - Glenn Ansley

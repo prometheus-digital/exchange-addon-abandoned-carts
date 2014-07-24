@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: iThemes Exchange - Abandoned Carts
- * Version: 1.0.1
+ * Version: 1.0.2
  * Description: Tracks abandoned carts and automatically emails customers
  * Plugin URI: http://ithemes.com/exchange/abandoned-carts
  * Author: iThemes
