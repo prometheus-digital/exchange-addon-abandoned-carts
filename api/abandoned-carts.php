@@ -414,7 +414,7 @@ function it_exchange_get_abanonded_cart_status_label( $abandoned_cart ) {
 function it_exchange_get_abandoned_cart_email_human_readable_schedule( $email_id ) {
 	$scheduling = get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_scheduling', true );
 	if ( ! empty( $scheduling['int'] ) && ! empty( $scheduling['unit'] ) )
-		$value = sprintf( _n( '1 ' . rtrim( $scheduling['unit'], 's' ), "%d " . $scheduling['unit'], $scheduling['int'], 'LION' ), $scheduling['int'] );
+		$value = sprintf( _n( '%d %s', '%d %ss', trim( $scheduling['int'] ), 'LION' ), $scheduling['int'], $scheduling['unit'] );
 	else
 		$value = __( 'Unknown', 'LION' );
 
