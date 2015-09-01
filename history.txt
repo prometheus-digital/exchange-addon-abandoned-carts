@@ -12,3 +12,5 @@
 	Compatibility Fix: Updated plugin and theme update data format to match changes in WordPress 4.2.
 1.0.5 - 2015-07-14 - Packaging Bot (lib/updater)
 	Enhancement: Updated link to iThemes support.
+1.1.0 - 2015-09-01 - Lew Ayotte, Elise Alley
+	Fix for scheduling column labels	
