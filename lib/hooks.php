@@ -268,18 +268,6 @@ function it_exchange_abandoned_carts_add_admin_link_for_all_email_templates() {
 add_action( 'admin_footer', 'it_exchange_abandoned_carts_add_admin_link_for_all_email_templates' );
 
 /**
- * Sets content type to HTML for our emails
- *
- * @since 1.0.0
- *
- * @param string $content_type the incoming content type
- * @return string
-*/
-function it_exchange_abandoned_cart_set_email_content_type( $content_type ) {
-	return 'text/html';
-}
-
-/**
  * Mark an email as read
  *
  * @since 1.0.0

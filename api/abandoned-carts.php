@@ -338,9 +338,18 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 
 	// Send the email
 	if ( ! empty( $user->data->user_email ) ) {
-		add_filter( 'wp_mail_content_type', 'it_exchange_abandoned_cart_set_email_content_type' );
-		wp_mail( $user->data->user_email, $email['subject'], $email['content'] );
-		remove_filter( 'wp_mail_content_type', 'it_exchange_abandoned_cart_set_email_content_type' );
+
+		$settings = it_exchange_get_option( 'settings_email' );
+
+		$headers = arry();
+		if ( !empty( $settings['receipt-email-address'] ) ) {
+			$headers[] = 'From: ' . $settings['receipt-email-name'] . ' <' . $settings['receipt-email-address'] . '>';
+		}
+		$headers[] = 'MIME-Version: 1.0';
+		$headers[] = 'Content-Type: text/html';
+		$headers[] = 'charset=utf-8';
+
+		wp_mail( $user->data->user_email, $email['subject'], $email['content'], $headers );
 
 		// After sending the email, add this email to the list of emails sent for this abandoned cart
 		$meta = array(
