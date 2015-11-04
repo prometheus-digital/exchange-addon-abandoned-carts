@@ -69,7 +69,7 @@ class IT_Exchange_Abandoned_Cart {
 	 * @param mixed $post  wp post id or post object. optional.
 	 * @return void
 	*/
-	function IT_Exchange_Abandoned_Cart( $post=false ) {
+	function __construct( $post=false ) {
 		// If not an object, try to grab the WP object
 		if ( ! is_object( $post ) )
 			$post = get_post( (int) $post );
@@ -97,5 +97,15 @@ class IT_Exchange_Abandoned_Cart {
 		$this->cart_value  = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_cart_value', true );
 		$this->emails_sent = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_emails_sent', true );
 		do_action( 'it_exchange_abandoned_cart_populate_post_meta_object_properties', $this->ID );
+	}
+	
+	/**
+	 * Class Deprecated Constructor
+	 *
+	 * @since 1.0.0
+	 * @return void
+	*/
+	function IT_Exchange_Abandoned_Cart() {
+		self::__construct();
 	}
 }

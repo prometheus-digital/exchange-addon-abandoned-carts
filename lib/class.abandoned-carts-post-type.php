@@ -19,7 +19,7 @@ class IT_Exchange_Abandoned_Cart_Post_Type {
 	 * @since 1.0.0
 	 * @return void
 	*/
-	function IT_Exchange_Abandoned_Cart_Post_Type() {
+	function __construct() {
 
 		$this->admin_menu_capability = apply_filters( 'it_exchange_abandoned_carts_admin_menu_cap', 'activate_plugins' );
 		$this->init();
@@ -35,6 +35,16 @@ class IT_Exchange_Abandoned_Cart_Post_Type {
 			add_filter( 'get_user_option_screen_layout_it_ex_abandoned', array( $this, 'update_user_column_options' ) );
 			add_filter( 'bulk_actions-edit-it_ex_abandoned', '__return_empty_array' );
 		}
+	}
+	
+	/**
+	 * Class Deprecated Constructor
+	 *
+	 * @since 1.0.0
+	 * @return void
+	*/
+	function IT_Exchange_Abandoned_Cart_Post_Type() {
+		self::__construct();
 	}
 
 	function init() {

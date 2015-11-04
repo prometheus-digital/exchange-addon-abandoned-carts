@@ -19,7 +19,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	 * @since 1.0.0
 	 * @return void
 	*/
-	function IT_Exchange_Abandoned_Cart_Email_Post_Type() {
+	function __construct() {
 
 		$this->admin_menu_capability = apply_filters( 'it_exchange_abandoned_carts_admin_menu_cap', 'activate_plugins' );
 		$this->init();
@@ -35,6 +35,16 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 			add_filter( 'enter_title_here', array( $this, 'modify_title_placeholder' ), 10, 2 );
 		}
 
+	}
+	
+	/**
+	 * Class Deprecated Constructor
+	 *
+	 * @since 1.0.0
+	 * @return void
+	*/
+	function IT_Exchange_Abandoned_Cart_Email_Post_Type() {
+		self::__construct();
 	}
 
 	function init() {
