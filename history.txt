@@ -14,3 +14,6 @@
 	Enhancement: Updated link to iThemes support.
 1.1.0 - 2015-09-01 - Lew Ayotte, Elise Alley
 	Fix for scheduling column labels	
+1.2.0 - 2015-11-04 - Lew Ayotte, Elise Alley
+	PHP7 Updates
+	Adding from headers (and other things) to abandoned cart emails
