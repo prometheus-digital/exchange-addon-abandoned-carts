@@ -49,6 +49,7 @@ class IT_Theme_API_Abandoned_Cart implements IT_Theme_API {
 	public $_tag_map = array(
 		'storename'        => 'store_name',
 		'reclaimlink'      => 'reclaim_link',
+		'tracker'          => 'tracker',
 		'products'         => 'products',
 		'productattribute' => 'product_attribute',
 		'variants'         => 'variants',
@@ -67,6 +68,17 @@ class IT_Theme_API_Abandoned_Cart implements IT_Theme_API {
 		$settings = it_exchange_get_option( 'settings_general' );
 
 		return $settings['company-name'];
+	}
+
+	/**
+	 * Tracker pixel.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return string
+	 */
+	public function tracker() {
+		return '<img src="' . add_query_arg( array( 'it-exchange-cart-summary' => $this->abandoned_cart->email . '-' . $this->abandoned_cart->ID ), get_home_url() ) . '" width="1" height="1" />';
 	}
 
 	/**

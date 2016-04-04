@@ -267,7 +267,13 @@ function it_exchange_abandoned_carts_get_abandonment_emails( $args=array() ) {
 		$scheduling  = get_post_meta( $template->ID, '_it_exchange_abandoned_cart_emails_scheduling_unix', true );
 
 		if ( ! empty( $subject ) && ! empty( $message ) && ! empty( $scheduling ) )
-			$emails[$template->ID] = array( 'title' => $subject, 'subject' => $subject, 'time' => $scheduling, 'content' => $message );
+			$emails[$template->ID] = array(
+				'title'   => $subject,
+				'subject' => $subject,
+				'time'    => $scheduling,
+				'content' => $message,
+				'ID'      => $template->ID
+			);
 	}
 
 	krsort( $emails );
@@ -295,61 +301,15 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 		return false;
 	}
 
-	$tracker = '<img src="' . add_query_arg( array( 'it-exchange-cart-summary' => $email_id . '-'  . $abandoned_cart->ID ), get_home_url() )  . '" width="1" height="1" />';
-
 	// Grab the email template we want to send
 	$emails = it_exchange_abandoned_carts_get_abandonment_emails();
-	$email  = isset( $emails[$email_id] ) ? $emails[$email_id] : false;
+	$email  = isset( $emails[ $email_id ] ) ? $emails[ $email_id ] : false;
 
 	if ( empty( $email ) ) {
 		return false;
 	}
 
-	// Get cached cart and set products if it matches
-	$cached_cart = it_exchange_get_cached_customer_cart( $abandoned_cart->customer_id );
-
-	if ( empty( $cached_cart ) ) {
-		return false;
-	}
-
-	$customer     = it_exchange_get_customer( $abandoned_cart->customer_id );
-	$notification = new IT_Exchange_Customer_Email_Notification( 'Abandoned Cart', 'abandoned-cart', new IT_Exchange_Email_Template( 'abandoned-cart' ), array(
-		'defaults' => array(
-			'subject' => $email['subject'],
-			'body'    => $email['content'] . $tracker
-		)
-	) );
-	
-	$abandoned_cart = clone $abandoned_cart;
-	$abandoned_cart->email = $email_id;
-	
-	$email = new IT_Exchange_Email( new IT_Exchange_Email_Recipient_Customer( $customer ), $notification, array(
-		'abandoned-cart' => $abandoned_cart
-	) );
-
-	it_exchange_send_email( $email );
-
-	// After sending the email, add this email to the list of emails sent for this abandoned cart
-	$meta = array(
-		'email_id'     => $email_id,
-		'time_sent'    => time(),
-		'to'           => $customer->data->user_email,
-		'subject'      => $email->get_subject(),
-		'message'      => $email->get_body(),
-		'cart_details' => it_exchange_get_cached_customer_cart( $abandoned_cart->customer_id ),
-	);
-	// Grab existing emails
-	$emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', true );
-	// Add this email info to the emails_sent array
-	$emails_sent[$email_id] = $meta;
-	// Update the post meta for the abadoned cart
-	update_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', $emails_sent );
-
-	// Also update the number of times this email template has been delivered
-	$number_sent = get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', true );
-	update_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', ($number_sent + 1) );
-
-	return true;
+	return IT_Exchange_Abandoned_Cart_Emails::send_email( $abandoned_cart, $email );
 }
 
 /**

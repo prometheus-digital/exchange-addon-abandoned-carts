@@ -19,7 +19,10 @@
 	<!-- HIDDEN PREHEADER TEXT -->
 	<div style="display: none; font-size: 1px; color: #fefefe; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
 		<?php printf( __( 'You forgot something in your cart at %s.', 'it-l10n-ithemes-exchange' ), it_exchange( 'abandoned-cart', 'get-store-name' ) ); ?>
+
+		<?php it_exchange( 'abandoned-cart', 'tracker' ); ?>
 	</div>
+
 
 <?php it_exchange_get_template_part( 'emails/partials/header' ); ?>
 

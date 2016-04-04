@@ -66,6 +66,8 @@ function it_exchange_abandoned_carts_process_qualified_shoppers_queue() {
     $now                      = time();
     $qualified_shoppers_queue = it_exchange_abandoned_carts_get_qualified_shoppers_queue();
     $cart_abandonment_emails  = it_exchange_abandoned_carts_get_abandonment_emails();
+	
+	IT_Exchange_Abandoned_Cart_Emails::batch();
 
     // Loop through all of our active carts
     foreach( $qualified_shoppers_queue as $user_id => $last_active ) {
@@ -111,6 +113,8 @@ function it_exchange_abandoned_carts_process_qualified_shoppers_queue() {
             }
         }
     }
+
+	IT_Exchange_Abandoned_Cart_Emails::batch( false );
 }
 add_action( 'it_exchange_abandoned_carts_hourly_event_hook', 'it_exchange_abandoned_carts_process_qualified_shoppers_queue' );
 
