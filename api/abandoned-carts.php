@@ -425,7 +425,9 @@ function it_exchange_get_abandoned_cart_email_opened_rate( $email_id ) {
 	$opened = (int) get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_opened', true );
 	$sent   = it_exchange_get_abandoned_cart_email_times_sent( $email_id );
 
-	$percentage = empty( $opened ) || empty( $sent ) ? 0 : $opened/$sent*100;
+	$percentage = empty( $opened ) || empty( $sent ) ? 0 : $opened / $sent * 100;
+	$percentage = min( $percentage, 100 );
+
 	return empty( $percentage )? 0 . '%' : round( $percentage, 2 ) . '%';
 }
 
@@ -442,7 +444,9 @@ function it_exchange_get_abandoned_cart_email_recovered_rate( $email_id ) {
 	$recovered = (int) get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_recovered', true );
 	$sent      = it_exchange_get_abandoned_cart_email_times_sent( $email_id );
 
-	$percentage = empty( $recovered ) || empty( $sent ) ? 0 : $recovered/$sent*100;
+	$percentage = empty( $recovered ) || empty( $sent ) ? 0 : $recovered / $sent * 100;
+	$percentage = min( $percentage, 100 );
+
 	return empty( $percentage )? 0 . '%' : round( $percentage, 2 ) . '%';
 }
 
