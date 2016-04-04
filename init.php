@@ -14,6 +14,11 @@ include( dirname( __FILE__ ) . '/lib/hooks.php' );
 include( dirname( __FILE__ ) . '/api/abandoned-carts.php' );
 
 /**
+ * Theme API
+ */
+include( dirname( __FILE__ ) . '/api/theme/abandoned-cart.php' );
+
+/**
  * Abandoned Carts Post Type
 */
 include( dirname( __FILE__ ) . '/lib/class.abandoned-carts-post-type.php' );

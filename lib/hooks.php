@@ -397,6 +397,40 @@ function it_exchange_get_abandoned_carts_stats() {
 add_action( 'wp_ajax_ithemes_exchange_abandoned_carts_data', 'it_exchange_get_abandoned_carts_stats' );
 
 /**
+ * Modify the available template paths.
+ *
+ * @since 1.3
+ *
+ * @param array $paths
+ *
+ * @return array
+ */
+function it_exchange_abandoned_carts_modify_template_paths( $paths = array() ) {
+
+	$paths[] = dirname( __FILE__ ) . '/templates/';
+
+	return $paths;
+}
+
+add_filter( 'it_exchange_possible_template_paths', 'it_exchange_abandoned_carts_modify_template_paths' );
+
+/**
+ * Globalize context for the theme API.
+ * 
+ * @since 1.3.0
+ * 
+ * @param array $context
+ */
+function it_exchange_abandoned_carts_globalize_context( $context ) {
+	
+	if ( ! empty( $context['abandoned-cart'] ) ) {
+		$GLOBALS['it_exchange']['abandoned_cart'] = $context['abandoned-cart'];
+	}
+}
+
+add_action( 'it_exchange_email_template_globalize_context', 'it_exchange_abandoned_carts_globalize_context' );
+
+/**
  * Register our shortcodes for the abandoned cart emails
  *
  * @since 1.0.0
