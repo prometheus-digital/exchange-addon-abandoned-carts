@@ -36,7 +36,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		}
 
 	}
-	
+
 	/**
 	 * Class Deprecated Constructor
 	 *
@@ -154,7 +154,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 
 		if ( ! empty( $human_readable_scheduling['int'] ) && ! empty( $human_readable_scheduling['unit'] ) ) {
 			// Set the base unit
-			switch ( $human_readable_scheduling['unit'] ) { 
+			switch ( $human_readable_scheduling['unit'] ) {
 				case 'weeks' :
 					$base = WEEK_IN_SECONDS;
 					break;
@@ -165,10 +165,10 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 					$base = HOUR_IN_SECONDS;
 					break;
 				case 'minutes' :
-				default        :   
+				default        :
 					$base = MINUTE_IN_SECONDS;
 					break;
-			}   
+			}
 			// Multiply the length times the units to get seconds for set frequency
 			$unix_scheduling = $human_readable_scheduling['int'] * $base;
 		}
@@ -346,7 +346,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		<select name="it-exchange-abandonded-cart-emails-scheduling[int]">
 		<?php
 		$ceiling = apply_filters( 'it_exchange_abandoned_carts_allow_minutes_in_schedule', false ) ? 59 : 23;
-		for( $i=1;$i<=$ceiling;$i++ ) { 
+		for( $i=1;$i<=$ceiling;$i++ ) {
 			?><option value="<?php echo $i; ?>" <?php selected( $i, $selected_int ); ?>><?php echo $i; ?></option><?php
 		}
 		?>
@@ -371,16 +371,35 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	 * @return void
 	*/
 	function print_abandoned_cart_email_shortcodes_metabox( $post ) {
+
+		$r = it_exchange_email_notifications()->get_replacer();
+
 		do_action( 'it_exchange_before_abandoned_cart_shortcodes' );
 		?>
-		<p><strong>Use the following shortcodes in your email template</strong></p>
-		<hr />
-		<p><pre>[exchange-abandoned-carts display="customer_name"]</pre><?php _e( 'Replaced with the customer\'s WordPress display name. Should be first and last name if registered through Exchange', 'LION' ); ?><br /><br /></p><hr />
-		<p><pre>[exchange-abandoned-carts display="customer_first_name"]</pre><?php _e( 'Replaced with the customer\'s first name. Uses "Customer" if blank.', 'LION' ); ?><br /><br /></p><hr />
-		<p><pre>[exchange-abandoned-carts display="customer_last_name"]</pre><?php _e( 'Replaced with the customer\'s last name if available. Blank if not.', 'LION' ); ?><br /><br /></p><hr />
-		<p><pre>[exchange-abandoned-carts display="store_name"]</pre><?php _e( 'Replaced with the store name in General Settings of Exchange', 'LION' ); ?><br /><br /></p><hr />
-		<p><pre>[exchange-abandoned-carts display="cart_products"]</pre><?php _e( 'Replaced with a list of the products in the cart along with their prices.', 'LION' ); ?><br /><br /></p><hr />
-		<p><pre>[exchange-abandoned-carts display="cart_link_href"]</pre><?php _e( 'Replaced with a unique URL for each customer\'s cart. Use inside the href tag of a link.', 'LION' ); ?><br /><br /></p>
+
+		<?php if ( $post && has_shortcode( $post->post_content, 'exchange-abandoned-carts' ) ): ?>
+			<div class="notice notice-error notice-alt notice-large below-h2">
+				<p>
+					<?php _e( 'Error: You are using the legacy email system. Upgrade to the new system for HTML templates.', 'LION' ); ?>
+					<?php _e('To upgrade, replace usages of the [exchange-abandoned-carts] shortcode, with the shortcodes listed below.', 'LION'); ?>
+				</p>
+			</div>
+		<?php endif; ?>
+
+		<p>
+			<strong>
+				<?php _e( "Use the following tags in your email template.", 'LION' ); ?>
+				<?php _e( "A summary of the customer's cart, and a link back to their cart is included in the email template.", 'LION' ); ?>
+			</strong>
+		</p>
+		<hr>
+
+		<ul>
+		<?php foreach ( $r->get_tags_for( new IT_Exchange_Customer_Email_Notification( 'Abandoned Cart', 'abandoned-cart' ) ) as $tag ): ?>
+			<li><code><?php echo $r->format_tag( $tag ); ?></code> &mdash; <?php echo $tag->get_description(); ?></li>
+		<?php endforeach; ?>
+		</ul>
+
 		<?php
 	}
 }
