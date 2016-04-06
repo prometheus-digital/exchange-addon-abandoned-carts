@@ -57,13 +57,11 @@ class IT_Exchange_Abandoned_Cart_Emails {
 			return self::send_legacy( $abandoned_cart, $email );
 		}
 
-		$tracker = '<img src="' . add_query_arg( array( 'it-exchange-cart-summary' => $email_id . '-' . $abandoned_cart->ID ), get_home_url() ) . '" width="1" height="1" />';
-
 		$customer     = it_exchange_get_customer( $abandoned_cart->customer_id );
 		$notification = new IT_Exchange_Customer_Email_Notification( 'Abandoned Cart', 'abandoned-cart', new IT_Exchange_Email_Template( 'abandoned-cart' ), array(
 			'defaults' => array(
 				'subject' => $email['subject'],
-				'body'    => $email['content'] . $tracker
+				'body'    => $email['content']
 			)
 		) );
 
