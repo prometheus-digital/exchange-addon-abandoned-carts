@@ -56,7 +56,7 @@ class IT_Exchange_Abandoned_Cart_Emails {
 		if ( has_shortcode( $email['content'], 'exchange-abandoned-carts' ) ) {
 			return self::send_legacy( $abandoned_cart, $email );
 		}
-		
+
 		$tracker = '<img src="' . add_query_arg( array( 'it-exchange-cart-summary' => $email_id . '-' . $abandoned_cart->ID ), get_home_url() ) . '" width="1" height="1" />';
 
 		$customer     = it_exchange_get_customer( $abandoned_cart->customer_id );
@@ -91,6 +91,11 @@ class IT_Exchange_Abandoned_Cart_Emails {
 		);
 		// Grab existing emails
 		$emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', true );
+
+		if ( empty( $emails_sent ) ) {
+			$emails_sent = array();
+		}
+
 		// Add this email info to the emails_sent array
 		$emails_sent[ $email_id ] = $meta;
 		// Update the post meta for the abadoned cart
@@ -188,6 +193,11 @@ class IT_Exchange_Abandoned_Cart_Emails {
 			);
 			// Grab existing emails
 			$emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', true );
+
+			if ( empty( $emails_sent ) ) {
+				$emails_sent = array();
+			}
+
 			// Add this email info to the emails_sent array
 			$emails_sent[ $email_id ] = $meta;
 			// Update the post meta for the abadoned cart
