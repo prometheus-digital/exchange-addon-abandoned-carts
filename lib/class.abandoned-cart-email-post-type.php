@@ -393,7 +393,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		<p>
 			<strong>
 				<?php _e( "Use the following tags in your email template.", 'LION' ); ?>
-				<?php _e( "A summary of the customer's cart, and a link back to their cart is included in the email template.", 'LION' ); ?>
+				<?php _e( "A summary of the customer's cart and a link back to their cart is included in the email template.", 'LION' ); ?>
 			</strong>
 		</p>
 		<hr>
