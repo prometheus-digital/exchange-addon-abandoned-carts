@@ -35,7 +35,7 @@
 					<tr>
 						<td width="640">
 			<![endif]-->
-			<table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 640px; background: <?php it_exchange( 'email', 'body-background-color' ); ?>;  margin: 25px auto 0 auto; border-bottom: 1px solid <?php it_exchange( 'email', 'body-highlight-color' ); ?>;" class="wrapper border-highlight-color body-bkg-color">
+			<table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 640px; background: <?php it_exchange( 'email', 'body-background-color' ); ?>;  margin: 0 auto; border-bottom: 1px solid <?php it_exchange( 'email', 'body-highlight-color' ); ?>;" class="wrapper border-highlight-color body-bkg-color">
 				<tr>
 					<td valign="top" style="padding: 20px 25px;">
 						<table width="100%">
