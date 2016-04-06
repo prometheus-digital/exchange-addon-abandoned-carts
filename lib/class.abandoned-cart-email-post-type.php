@@ -312,7 +312,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		$post_type = 'it_ex_abandond_email';
 		add_meta_box( 'it-exchange-abandoned-cart-email-scheduling', $title, $callback, $post_type, 'side', 'default' );
 
-		$title     = __( 'Available Shortcodes', 'LION' );
+		$title     = __( 'Available Tags', 'LION' );
 		$callback  = array( $this, 'print_abandoned_cart_email_shortcodes_metabox' );
 		add_meta_box( 'it-exchange-abandoned-cart-email-shortcodes', $title, $callback, $post_type, 'normal', 'high' );
 	}
@@ -385,7 +385,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 			<div class="notice notice-error notice-alt notice-large below-h2">
 				<p>
 					<?php _e( 'Error: You are using the legacy email system. Upgrade to the new system for HTML templates.', 'LION' ); ?>
-					<?php _e('To upgrade, replace usages of the [exchange-abandoned-carts] shortcode, with the shortcodes listed below.', 'LION'); ?>
+					<?php _e('To upgrade, replace usages of the [exchange-abandoned-carts] shortcode, with the email tags listed below.', 'LION'); ?>
 				</p>
 			</div>
 		<?php endif; ?>

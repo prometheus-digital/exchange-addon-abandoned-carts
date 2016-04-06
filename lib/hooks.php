@@ -490,18 +490,16 @@ function it_exchange_abandoned_cart_emails_create_example_email() {
 	if ( ! empty( $emails ) )
 		return;
 
+	$r = it_exchange_email_notifications()->get_replacer();
+
 	$args = array(
 		'post_type'    => 'it_ex_abandond_email',
 		'post_status'  => 'draft',
 		'post_title'   => __( 'You Forgot Something Awesome!', 'LION' ),
-		'post_content' => 'Hi [exchange-abandoned-carts display="customer_first_name"],
-<p>Your shopping cart at [exchange-abandoned-carts display="store_name"] has been reserved and is waiting for your return!</p>
-<p>In your cart, you left ...<br />
-[exchange-abandoned-carts display="cart_products"]
-</p>
-<p>Here\'s a link to quickly get back to your cart<br /><a href="[exchange-abandoned-carts display=\'cart_link_href\']">Return to your cart</a></p>
-<p>Is there anything holding you back from making your purchase today? We\'re here to help. If you have any questions, just reply back to this email.</p>
-<p>Your Friends at [exchange-abandoned-carts display="store_name"]</p>'
+		'post_content' => "Hi {$r->format_tag( 'first_name' )}
+<p>Your shopping cart at {$r->format_tag( 'company_name' )} has been reserved and is waiting for your return!</p>
+<p>Is there anything holding you back from making your purchase today? We're here to help. If you have any questions, just reply back to this email.</p>
+<p>Your Friends at {$r->format_tag( 'company_name' )}</p>"
 	);
 
 	if ( $id = wp_insert_post( $args ) ) {
