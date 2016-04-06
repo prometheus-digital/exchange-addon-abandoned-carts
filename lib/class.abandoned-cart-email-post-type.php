@@ -262,6 +262,10 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 			case 'it_exchange_abandoned_cart_email_status_column' :
 				$post_status = get_post_status_object( $post->post_status );
 				esc_attr_e( empty( $post_status->label ) ? ucwords( $post->post_status ) : $post_status->label );
+
+				if ( has_shortcode( $post->post_content, 'exchange-abandoned-carts' ) ) {
+					echo " &ndash; <span style='color: #dc3232;'>" . __( "Legacy", 'LION' ) . '</span>';
+				}
 				break;
 			case 'it_exchange_abandoned_cart_email_subject_column' :
 				esc_attr_e( get_the_title( $post->ID ) );
