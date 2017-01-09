@@ -17,7 +17,7 @@ class IT_Exchange_Abandoned_Cart_Emails {
 	/**
 	 * Toggle batching of emails.
 	 *
-	 * @since 1.3.0
+	 * @since 2.0.0
 	 *
 	 * @param bool $batch
 	 */
@@ -35,7 +35,7 @@ class IT_Exchange_Abandoned_Cart_Emails {
 	/**
 	 * Send an email.
 	 *
-	 * @since 1.3.0
+	 * @since 2.0.0
 	 *
 	 * @param mixed $abandoned_cart
 	 * @param array $email
@@ -109,7 +109,7 @@ class IT_Exchange_Abandoned_Cart_Emails {
 	/**
 	 * Legacy sender.
 	 *
-	 * @since 1.3.0
+	 * @since 2.0.0
 	 *
 	 * @param mixed $abandoned_cart
 	 * @param array $email

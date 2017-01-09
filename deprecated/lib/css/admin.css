@@ -1,0 +1,15 @@
+/** -----------------------------------------------------:[ abandoned cart overview/chart ]:---------- */
+.it-exchange-abandoned-carts-dashboard .abandoned-carts-overview { background:#fff;padding:2em;margin:0 0 3em 0; }
+.it-exchange-abandoned-carts-dashboard .abandoned-carts-overview h3 { margin-top:0; }
+.it-exchange-abandoned-carts-dashboard .abandoned-carts-overview-items {overflow:hidden;padding: 1em;}
+.it-exchange-abandoned-carts-dashboard .abandoned-carts-overview-items .overview-item { width:25%;float:left;padding:0 0 1em 0;text-align:center; }
+.it-exchange-abandoned-carts-dashboard .abandoned-carts-overview-items .overview-item .overview-item-value { font-weight:bold;font-size:2em;line-height:1.4em; }
+.it-exchange-abandoned-carts-dashboard .abandoned-carts-overview .overview-chart {width: 100%; margin-top: 2em;}
+
+/** -----------------------------------------------------:[ abadoned cart wp table class ]: --------------*/
+.tablenav.top .bulkactions { display:none; }
+
+/** -----------------------------------------------------:[ abadoned cart media queries ]: --------------*/
+@media screen and (max-width: 850px) {
+	.it-exchange-abandoned-carts-dashboard .abandoned-carts-overview-items .overview-item { width: 50%;}
+} 

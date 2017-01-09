@@ -1,0 +1,19 @@
+1.0.2 - 2014-07-24 - Glenn Ansley
+	Round Email opened, clickthrough, and conversion rates to 2 decimal places
+	Remove Builder Layout metabox from email add/edit screens
+1.0.1 - 2014-07-22 - Glenn Ansley
+	Fix PHP Error showing up on first use.
+1.0.0 - 2014-07-21 - Glenn Ansley
+	Initial Release
+1.0.3 - 2014-11-14 - Packaging Bot (lib/updater)
+	Enhancement: Reduced caching to allow updates to appear more quickly.
+	Enhancement: Authenticating users now uses the new authentication system.
+1.0.4 - 2015-04-23 - Packaging Bot (lib/updater)
+	Compatibility Fix: Updated plugin and theme update data format to match changes in WordPress 4.2.
+1.0.5 - 2015-07-14 - Packaging Bot (lib/updater)
+	Enhancement: Updated link to iThemes support.
+1.1.0 - 2015-09-01 - Lew Ayotte, Elise Alley
+	Fix for scheduling column labels	
+1.2.0 - 2015-11-04 - Lew Ayotte, Elise Alley
+	PHP7 Updates
+	Adding from headers (and other things) to abandoned cart emails

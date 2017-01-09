@@ -160,6 +160,16 @@ function it_exchange_abandoned_carts_update_last_qualified_activity_for_user( $c
 	$queue = it_exchange_abandoned_carts_get_qualified_shoppers_queue();
 	$queue[$customer_id] = $now;
 	it_exchange_abandoned_carts_update_qualified_shoppers_queue( $queue );
+
+	/**
+	 * @todo Introduce this in a later version along with lost / usubscribed and other statuses
+	 *
+	 * // If user has an abandoned cart, mark it as reengaged
+	 * if ( $cart = it_exchange_get_active_abandoned_cart_for_user( $customer_id ) ) {
+	 * if ( 'abandoned' == $cart->cart_status )
+	 * update_post_meta( $cart->ID, '_it_exchange_abandoned_cart_cart_status', 'reengaged' );
+	 * }
+	*/
 }
 
 /**
@@ -252,18 +262,15 @@ function it_exchange_abandoned_carts_get_abandonment_emails( $args=array() ) {
 
 	$emails = array();
 	foreach( (array) $email_templates as $template ) {
-		$subject     = get_the_title( $template->ID );
-		$message     = $template->post_content;
-		$scheduling  = get_post_meta( $template->ID, '_it_exchange_abandoned_cart_emails_scheduling_unix', true );
+		$subject         = get_the_title( $template->ID );
+		$temp            = $GLOBALS['post'];
+		$GLOBALS['post'] = $template;
+		$message         = $template->post_content;
+		$GLOBALS['post'] = $temp;
+		$scheduling      = get_post_meta( $template->ID, '_it_exchange_abandoned_cart_emails_scheduling_unix', true );
 
 		if ( ! empty( $subject ) && ! empty( $message ) && ! empty( $scheduling ) )
-			$emails[$template->ID] = array(
-				'title'   => $subject,
-				'subject' => $subject,
-				'time'    => $scheduling,
-				'content' => $message,
-				'ID'      => $template->ID
-			);
+			$emails[$template->ID] = array( 'title' => $subject, 'subject' => $subject, 'time' => $scheduling, 'content' => $message );
 	}
 
 	krsort( $emails );
@@ -276,30 +283,94 @@ function it_exchange_abandoned_carts_get_abandonment_emails( $args=array() ) {
  * @since 1.0.0
  *
  * @param mixed $abandoned_cart object or id
- * @param int   $email_id      the email id
- *
- * @return bool
+ * @parma int   $email_id      the email id
 */
 function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $email_id ) {
-
 	// Make sure the abandoned_cart is an object
-	if ( empty( $abandoned_cart->ID ) ) {
+	if ( empty( $abandoned_cart->ID ) )
 		$abandoned_cart = it_exchange_get_abandoned_cart( $abandoned_cart );
-	}
-
-	if ( ! is_object( $abandoned_cart ) || 'IT_Exchange_Abandoned_Cart' != get_class( $abandoned_cart ) ) {
+	if ( ! is_object( $abandoned_cart ) || 'IT_Exchange_Abandoned_Cart' != get_class( $abandoned_cart ) )
 		return false;
-	}
 
 	// Grab the email template we want to send
 	$emails = it_exchange_abandoned_carts_get_abandonment_emails();
-	$email  = isset( $emails[ $email_id ] ) ? $emails[ $email_id ] : false;
+	$email  = isset( $emails[$email_id] ) ? $emails[$email_id] : false;
 
-	if ( empty( $email ) ) {
-		return false;
+	// Get the user for the email
+	$user = get_userdata( $abandoned_cart->customer_id );
+
+	// Get cached cart and set products if it matches
+	$cached_cart = it_exchange_get_cached_customer_cart( $abandoned_cart->customer_id );
+	$products    = array();
+	$cart_value  = empty( $abandoned_cart->cart_value ) ? false : $abandoned_cart->cart_value;
+	$first_name  = get_user_meta( $abandoned_cart->customer_id, 'first_name', true );
+	$last_name   = get_user_meta( $abandoned_cart->customer_id, 'last_name', true );
+
+	if ( ! empty( $cached_cart['cart_id'][0] ) && $cached_cart['cart_id'][0] == $abandoned_cart->cart_id ) {
+		if ( ! empty( $cached_cart['products'] ) ) {
+			foreach( (array) $cached_cart['products'] as $product ) {
+				$product_title = it_exchange_get_product_feature( $product['product_id'], 'title' );
+				$base_price = it_exchange_get_product_feature( $product['product_id'], 'base-price' );
+				if ( ! empty( $product_title ) )
+					$products[]  = array( 'title' => $product_title, 'price' => it_exchange_format_price( $base_price ) );
+			}
+		}
 	}
 
-	return IT_Exchange_Abandoned_Cart_Emails::send_email( $abandoned_cart, $email );
+	// Setup globals for Shortcodes and apply the_content
+	$GLOBALS['it_exchange']['abandoned_carts']['shortcode_data'] = array(
+		'customer_name'       => empty( $user->data->display_name ) ?  __( 'Customer', 'LION' ) : $user->data->display_name,
+		'customer_first_name' => empty( $first_name ) ?  __( 'Customer', 'LION' ) : $first_name,
+		'customer_last_name'  => empty( $last_name ) ?  __( '', 'LION' ) : $last_name,
+		'cart_link_href'      => it_exchange_generate_reclaim_link_for_abandoned_email( $email_id, $abandoned_cart->ID ),
+		'cart_products'       => $products,
+		'cart_value'          => $cart_value,
+	);
+	$email['content'] = apply_filters( 'the_content', $email['content'] );
+	unset( $GLOBALS['it_exchange']['abandoned_carts']['shortcode_data'] );
+
+	// Make sure we found the email we're looking for.
+	if ( empty( $email ) )
+		return false;
+
+	// Add tracking code
+	$email['content'] .= '<img src="' . add_query_arg( array( 'it-exchange-cart-summary' => $email_id . '-'  . $abandoned_cart->ID ), get_home_url() )  . '" width="1" height="1" />';
+
+	// Send the email
+	if ( ! empty( $user->data->user_email ) ) {
+
+		$settings = it_exchange_get_option( 'settings_email' );
+
+		$headers = arry();
+		if ( !empty( $settings['receipt-email-address'] ) ) {
+			$headers[] = 'From: ' . $settings['receipt-email-name'] . ' <' . $settings['receipt-email-address'] . '>';
+		}
+		$headers[] = 'MIME-Version: 1.0';
+		$headers[] = 'Content-Type: text/html';
+		$headers[] = 'charset=utf-8';
+
+		wp_mail( $user->data->user_email, $email['subject'], $email['content'], $headers );
+
+		// After sending the email, add this email to the list of emails sent for this abandoned cart
+		$meta = array(
+			'email_id'     => $email_id,
+			'time_sent'    => time(),
+			'to'           => $user->data->user_email,
+			'subject'      => $email['subject'],
+			'message'      => $email['content'],
+			'cart_details' => it_exchange_get_cached_customer_cart( $abandoned_cart->customer_id ),
+		);
+		// Grab existing emails
+		$emails_sent = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', true );
+		// Add this email info to the emails_sent array
+		$emails_sent[$email_id] = $meta;
+		// Update the post meta for the abadoned cart
+		update_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', $emails_sent );
+
+		// Also update the number of times this email template has been delivered
+		$number_sent = get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', true );
+		update_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_sent', ($number_sent + 1) );
+	}
 }
 
 /**
@@ -415,9 +486,7 @@ function it_exchange_get_abandoned_cart_email_opened_rate( $email_id ) {
 	$opened = (int) get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_opened', true );
 	$sent   = it_exchange_get_abandoned_cart_email_times_sent( $email_id );
 
-	$percentage = empty( $opened ) || empty( $sent ) ? 0 : $opened / $sent * 100;
-	$percentage = min( $percentage, 100 );
-
+	$percentage = empty( $opened ) || empty( $sent ) ? 0 : $opened/$sent*100;
 	return empty( $percentage )? 0 . '%' : round( $percentage, 2 ) . '%';
 }
 
@@ -434,9 +503,7 @@ function it_exchange_get_abandoned_cart_email_recovered_rate( $email_id ) {
 	$recovered = (int) get_post_meta( $email_id, '_it_exchange_abandoned_cart_emails_recovered', true );
 	$sent      = it_exchange_get_abandoned_cart_email_times_sent( $email_id );
 
-	$percentage = empty( $recovered ) || empty( $sent ) ? 0 : $recovered / $sent * 100;
-	$percentage = min( $percentage, 100 );
-
+	$percentage = empty( $recovered ) || empty( $sent ) ? 0 : $recovered/$sent*100;
 	return empty( $percentage )? 0 . '%' : round( $percentage, 2 ) . '%';
 }
 

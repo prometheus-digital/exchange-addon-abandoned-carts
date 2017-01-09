@@ -66,8 +66,6 @@ function it_exchange_abandoned_carts_process_qualified_shoppers_queue() {
     $now                      = time();
     $qualified_shoppers_queue = it_exchange_abandoned_carts_get_qualified_shoppers_queue();
     $cart_abandonment_emails  = it_exchange_abandoned_carts_get_abandonment_emails();
-	
-	IT_Exchange_Abandoned_Cart_Emails::batch();
 
     // Loop through all of our active carts
     foreach( $qualified_shoppers_queue as $user_id => $last_active ) {
@@ -113,8 +111,6 @@ function it_exchange_abandoned_carts_process_qualified_shoppers_queue() {
             }
         }
     }
-
-	IT_Exchange_Abandoned_Cart_Emails::batch( false );
 }
 add_action( 'it_exchange_abandoned_carts_hourly_event_hook', 'it_exchange_abandoned_carts_process_qualified_shoppers_queue' );
 
@@ -401,40 +397,6 @@ function it_exchange_get_abandoned_carts_stats() {
 add_action( 'wp_ajax_ithemes_exchange_abandoned_carts_data', 'it_exchange_get_abandoned_carts_stats' );
 
 /**
- * Modify the available template paths.
- *
- * @since 1.3
- *
- * @param array $paths
- *
- * @return array
- */
-function it_exchange_abandoned_carts_modify_template_paths( $paths = array() ) {
-
-	$paths[] = dirname( __FILE__ ) . '/templates/';
-
-	return $paths;
-}
-
-add_filter( 'it_exchange_possible_template_paths', 'it_exchange_abandoned_carts_modify_template_paths' );
-
-/**
- * Globalize context for the theme API.
- * 
- * @since 2.0.0
- * 
- * @param array $context
- */
-function it_exchange_abandoned_carts_globalize_context( $context ) {
-	
-	if ( ! empty( $context['abandoned-cart'] ) ) {
-		$GLOBALS['it_exchange']['abandoned_cart'] = $context['abandoned-cart'];
-	}
-}
-
-add_action( 'it_exchange_email_template_globalize_context', 'it_exchange_abandoned_carts_globalize_context' );
-
-/**
  * Register our shortcodes for the abandoned cart emails
  *
  * @since 1.0.0
@@ -490,16 +452,18 @@ function it_exchange_abandoned_cart_emails_create_example_email() {
 	if ( ! empty( $emails ) )
 		return;
 
-	$r = it_exchange_email_notifications()->get_replacer();
-
 	$args = array(
 		'post_type'    => 'it_ex_abandond_email',
 		'post_status'  => 'draft',
 		'post_title'   => __( 'You Forgot Something Awesome!', 'LION' ),
-		'post_content' => "Hi {$r->format_tag( 'first_name' )}
-<p>Your shopping cart at {$r->format_tag( 'company_name' )} has been reserved and is waiting for your return!</p>
-<p>Is there anything holding you back from making your purchase today? We're here to help. If you have any questions, just reply back to this email.</p>
-<p>Your Friends at {$r->format_tag( 'company_name' )}</p>"
+		'post_content' => 'Hi [exchange-abandoned-carts display="customer_first_name"],
+<p>Your shopping cart at [exchange-abandoned-carts display="store_name"] has been reserved and is waiting for your return!</p>
+<p>In your cart, you left ...<br />
+[exchange-abandoned-carts display="cart_products"]
+</p>
+<p>Here\'s a link to quickly get back to your cart<br /><a href="[exchange-abandoned-carts display=\'cart_link_href\']">Return to your cart</a></p>
+<p>Is there anything holding you back from making your purchase today? We\'re here to help. If you have any questions, just reply back to this email.</p>
+<p>Your Friends at [exchange-abandoned-carts display="store_name"]</p>'
 	);
 
 	if ( $id = wp_insert_post( $args ) ) {

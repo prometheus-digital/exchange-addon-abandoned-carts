@@ -59,7 +59,7 @@ class IT_Theme_API_Abandoned_Cart implements IT_Theme_API {
 	/**
 	 * Print the store name.
 	 *
-	 * @since 1.3.0
+	 * @since 2.0.0
 	 *
 	 * @return string
 	 */
@@ -73,7 +73,7 @@ class IT_Theme_API_Abandoned_Cart implements IT_Theme_API {
 	/**
 	 * Tracker pixel.
 	 *
-	 * @since 1.3.0
+	 * @since 2.0.0
 	 *
 	 * @return string
 	 */
@@ -84,7 +84,7 @@ class IT_Theme_API_Abandoned_Cart implements IT_Theme_API {
 	/**
 	 * Generate reclaim link.
 	 *
-	 * @since 1.3.0
+	 * @since 2.0.0
 	 *
 	 * @param array $options
 	 *
@@ -116,7 +116,7 @@ class IT_Theme_API_Abandoned_Cart implements IT_Theme_API {
 	 * It return false when it reaches the last product
 	 * If the has flag has been passed, it just returns a boolean
 	 *
-	 * @since 1.3.0
+	 * @since 2.0.0
 	 *
 	 * @return string
 	 */
@@ -155,7 +155,7 @@ class IT_Theme_API_Abandoned_Cart implements IT_Theme_API {
 	/**
 	 * Use this to get a abandoned cart product attribute like title, description, price, etc.
 	 *
-	 * @since 1.3.0
+	 * @since 2.0.0
 	 *
 	 * @return string
 	 */
@@ -254,7 +254,7 @@ class IT_Theme_API_Abandoned_Cart implements IT_Theme_API {
 	/**
 	 * Print the varaints.
 	 *
-	 * @since 1.3.0
+	 * @since 2.0.0
 	 *
 	 * @param array $options
 	 *
@@ -289,7 +289,7 @@ class IT_Theme_API_Abandoned_Cart implements IT_Theme_API {
 	/**
 	 * The product's featured image
 	 *
-	 * @since 1.3.0
+	 * @since 2.0.0
 	 *
 	 * @param array $options
 	 *

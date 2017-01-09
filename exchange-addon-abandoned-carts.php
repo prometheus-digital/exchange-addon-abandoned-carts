@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: iThemes Exchange - Abandoned Carts
- * Version: 1.2.0
+ * Version: 2.0.0
  * Description: Tracks abandoned carts and automatically emails customers
  * Plugin URI: http://ithemes.com/exchange/abandoned-carts
  * Author: iThemes
@@ -17,42 +17,19 @@
 */
 
 /**
- * This registers our plugin as an exchange addon
+ * Load the Abandoned Carts plugin.
  *
- * To learn how to create your own-addon, visit http://ithemes.com/codex/page/Exchange_Custom_Add-ons:_Overview
- *
- * @since 1.0.0
- *
- * @return void
-*/
-function it_exchange_register_abandoned_carts_addon() {
-	$options = array(
-		'name'              => __( 'Abandoned Carts', 'LION' ),
-		'description'       => __( 'Tracks abandoned carts and automatically emails customers.', 'LION' ),
-		'author'            => 'iThemes',
-		'author_url'        => 'http://ithemes.com/exchange/abandoned-carts/',
-		'icon'              => ITUtility::get_url_from_file( dirname( __FILE__ ) . '/lib/abandoned-carts50px.png' ),
-		'file'              => dirname( __FILE__ ) . '/init.php',
-		'category'          => 'admin',
-	);
-
-	if ( version_compare( $GLOBALS['it_exchange']['version'], '1.36.0', '>=' ) ) {
-		it_exchange_register_addon( 'abandoned-carts', $options );
+ * @since 2.0.0
+ */
+function it_exchange_load_abandoned_carts() {
+	if ( ! function_exists( 'it_exchange_load_deprecated' ) || it_exchange_load_deprecated() ) {
+		require_once dirname( __FILE__ ) . '/deprecated/exchange-addon-abandoned-carts.php';
+	} else {
+		require_once dirname( __FILE__ ) . '/plugin.php';
 	}
 }
-add_action( 'it_exchange_register_addons', 'it_exchange_register_abandoned_carts_addon' );
 
-/**
- * Loads the translation data for WordPress
- *
- * @uses load_plugin_textdomain()
- * @since 1.0.0
- * @return void
-*/
-function it_exchange_abandoned_carts_set_textdomain() {
-	load_plugin_textdomain( 'LION', false, dirname( plugin_basename( __FILE__  ) ) . '/lang/' );
-}
-add_action( 'plugins_loaded', 'it_exchange_abandoned_carts_set_textdomain' );
+add_action( 'plugins_loaded', 'it_exchange_load_abandoned_carts' );
 
 /**
  * Registers Plugin with iThemes updater class
@@ -90,29 +67,3 @@ function it_exchange_abandoned_carts_deactivation_hook() {
 	wp_clear_scheduled_hook( 'it_exchange_abandoned_carts_hourly_event_hook' );
 }
 register_deactivation_hook( __FILE__, 'it_exchange_abandoned_carts_deactivation_hook' );
-
-/**
- * Show required Exchange version nag.
- *
- * @since 1.0.0
- *
- * @return void
- */
-function it_exchange_addon_abandoned_carts_show_exchange_version_nag() {
-	if ( version_compare( $GLOBALS['it_exchange']['version'], '1.36.0', '<' ) ) {
-		?>
-		<div id="it-exchange-add-on-min-version-nag" class="it-exchange-nag">
-			<?php printf( __( 'The Abandoned Carts add-on requires iThemes Exchange version 1.36.0 or greater. %sPlease upgrade Exchange%s.', 'LION' ), '<a href="' . admin_url( 'update-core.php' ) . '">', '</a>' ); ?>
-		</div>
-		<script type="text/javascript">
-			jQuery( document ).ready( function () {
-				if ( jQuery( '.wrap > h2' ).length == '1' ) {
-					jQuery( "#it-exchange-add-on-min-version-nag" ).insertAfter( '.wrap > h2' ).addClass( 'after-h2' );
-				}
-			} );
-		</script>
-		<?php
-	}
-}
-
-add_action( 'admin_notices', 'it_exchange_addon_abandoned_carts_show_exchange_version_nag' );
