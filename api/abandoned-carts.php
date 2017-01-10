@@ -53,7 +53,6 @@ function it_exchange_get_abandoned_carts( $args=array() ) {
     }
 	unset( $args['customer'] );
 
-    $abandoned_carts = false;
     if ( $abandoned_carts = get_posts( $args ) ) {
         foreach( $abandoned_carts as $key => $abandoned_cart ) {
             $abandoned_carts[$key] = it_exchange_get_abandoned_cart( $abandoned_cart );
@@ -67,20 +66,27 @@ function it_exchange_get_abandoned_carts( $args=array() ) {
  * Retreives a abdndoned cart object by passing it the WP post object or post id
  *
  * @since 1.0.0
- * @param  mixed  $post                       post object or post id
- * @return object IT_Exchange_Abandoned_Cart  object for passed post
+ *
+ * @param int|WP_Post $post post object or post id
+ *
+ * @return IT_Exchange_Abandoned_Cart|false
 */
 function it_exchange_get_abandoned_cart( $post ) {
-    $abandoned_cart = new IT_Exchange_Abandoned_Cart( $post );
-    if ( $abandoned_cart->ID ) {
-		$abandoned_cart->customer_id       = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_customer_id', true );
-		$abandoned_cart->emails_sent       = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_emails_sent', true );
-		$abandoned_cart->cart_status       = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_status', true );
-		$abandoned_cart->cart_id           = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_cart_id', true );
-		$abandoned_cart->conversion_source = get_post_meta( $abandoned_cart->ID, '_it_exchange_abandoned_cart_conversion_source', true );
-        return apply_filters( 'it_exchange_get_abandoned_cart', $abandoned_cart, $post );
+
+	if ( ! $post instanceof IT_Exchange_Abandoned_Cart ) {
+
+		$post = get_post( $post );
+
+		if ( ! $post ) {
+			return false;
+		}
+
+		$abandoned_cart = new IT_Exchange_Abandoned_Cart( $post );
+	} else {
+		$abandoned_cart = $post;
 	}
-    return apply_filters( 'it_exchange_get_abandoned_cart', false, $post );
+
+	return apply_filters( 'it_exchange_get_abandoned_cart', $abandoned_cart, $post );
 }
 
 /**
@@ -287,7 +293,7 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 		$abandoned_cart = it_exchange_get_abandoned_cart( $abandoned_cart );
 	}
 
-	if ( ! is_object( $abandoned_cart ) || 'IT_Exchange_Abandoned_Cart' != get_class( $abandoned_cart ) ) {
+	if ( ! $abandoned_cart instanceof IT_Exchange_Abandoned_Cart ) {
 		return false;
 	}
 
@@ -314,8 +320,10 @@ function it_exchange_get_abanonded_cart_status_label( $abandoned_cart ) {
 	// Make sure the abandoned_cart is an object
 	if ( empty( $abandoned_cart->ID ) )
 		$abandoned_cart = it_exchange_get_abandoned_cart( $abandoned_cart );
-	if ( ! is_object( $abandoned_cart ) || 'IT_Exchange_Abandoned_Cart' != get_class( $abandoned_cart ) )
+
+	if ( ! $abandoned_cart instanceof IT_Exchange_Abandoned_Cart ) {
 		return __( 'Unknown', 'LION' );
+	}
 
 	switch( $abandoned_cart->cart_status ) {
 		case 'abandoned' :

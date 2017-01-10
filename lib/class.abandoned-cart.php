@@ -84,7 +84,7 @@ class IT_Exchange_Abandoned_Cart {
 
 		// Return a WP Error if we don't have the $post object by this point
 		if ( ! $post )
-			return new WP_Error( 'it-exchange-product-not-a-wp-post', __( 'The IT_Exchange_Abandoned_Cart class must have a WP post object or ID passed to its constructor', 'LION' ) );
+			return;
 
 		// Grab the $post object vars and populate this objects vars
 		foreach( (array) get_object_vars( $post ) as $var => $value ) {
@@ -92,10 +92,13 @@ class IT_Exchange_Abandoned_Cart {
 		}
 
 		// Populate core postmeta
+		$this->emails_sent = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_emails_sent', true );
+		$this->cart_id     = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_cart_id', true );
 		$this->customer_id = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_customer_id', true );
 		$this->cart_status = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_cart_status', true );
 		$this->cart_value  = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_cart_value', true );
 		$this->emails_sent = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_emails_sent', true );
+		$this->conversion_source = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_conversion_source', true );
 		do_action( 'it_exchange_abandoned_cart_populate_post_meta_object_properties', $this->ID );
 	}
 	

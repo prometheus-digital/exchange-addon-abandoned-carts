@@ -38,11 +38,11 @@ class IT_Exchange_Abandoned_Cart_Emails {
 	 * @since 2.0.0
 	 *
 	 * @param mixed $abandoned_cart
-	 * @param array $email
+	 * @param array $email_config
 	 *
 	 * @return bool
 	 */
-	public static function send_email( IT_Exchange_Abandoned_Cart $abandoned_cart, array $email ) {
+	public static function send_email( IT_Exchange_Abandoned_Cart $abandoned_cart, array $email_config ) {
 
 		// Get cached cart and set products if it matches
 		$cached_cart = it_exchange_get_cached_customer_cart( $abandoned_cart->customer_id );
@@ -51,17 +51,17 @@ class IT_Exchange_Abandoned_Cart_Emails {
 			return false;
 		}
 
-		$email_id = $email['ID'];
+		$email_id = $email_config['ID'];
 
-		if ( has_shortcode( $email['content'], 'exchange-abandoned-carts' ) ) {
-			return self::send_legacy( $abandoned_cart, $email );
+		if ( has_shortcode( $email_config['content'], 'exchange-abandoned-carts' ) ) {
+			return self::send_legacy( $abandoned_cart, $email_config );
 		}
 
 		$customer     = it_exchange_get_customer( $abandoned_cart->customer_id );
 		$notification = new IT_Exchange_Customer_Email_Notification( 'Abandoned Cart', 'abandoned-cart', new IT_Exchange_Email_Template( 'abandoned-cart' ), array(
 			'defaults' => array(
-				'subject' => $email['subject'],
-				'body'    => $email['content']
+				'subject' => $email_config['subject'],
+				'body'    => $email_config['content']
 			)
 		) );
 
@@ -154,7 +154,8 @@ class IT_Exchange_Abandoned_Cart_Emails {
 			'cart_products'       => $products,
 			'cart_value'          => $cart_value,
 		);
-		$email['content']                                            = apply_filters( 'the_content', $email['content'] );
+		$email['content'] = apply_filters( 'the_content', $email['content'] );
+
 		unset( $GLOBALS['it_exchange']['abandoned_carts']['shortcode_data'] );
 
 		// Make sure we found the email we're looking for.

@@ -7,6 +7,8 @@
  * Hooks
  */
 include( dirname( __FILE__ ) . '/lib/hooks.php' );
+include( dirname( __FILE__ ) . '/lib/email.php' );
+include( dirname( __FILE__ ) . '/lib/display.php' );
 
 /**
  * API
