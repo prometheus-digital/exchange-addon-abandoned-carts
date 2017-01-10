@@ -133,6 +133,11 @@ class IT_Exchange_Abandoned_Cart_Emails {
 		if ( ! empty( $cached_cart['cart_id'][0] ) && $cached_cart['cart_id'][0] == $abandoned_cart->cart_id ) {
 			if ( ! empty( $cached_cart['products'] ) ) {
 				foreach ( (array) $cached_cart['products'] as $product ) {
+
+					if ( empty( $product['product_id'] ) ) {
+						continue;
+					}
+
 					$product_title = it_exchange_get_product_feature( $product['product_id'], 'title' );
 					$base_price    = it_exchange_get_product_feature( $product['product_id'], 'base-price' );
 					if ( ! empty( $product_title ) ) {

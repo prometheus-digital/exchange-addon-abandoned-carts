@@ -30,61 +30,66 @@ add_action( 'it_exchange_cache_customer_cart', 'it_exchange_abandoned_carts_bump
  * If shopper has abandoned cart (based on timeout settings) we send an abanonded cart email to them
 */
 function it_exchange_abandoned_carts_process_qualified_shoppers_queue() {
-	
-    $now                      = time();
-    $qualified_shoppers_queue = it_exchange_abandoned_carts_get_qualified_shoppers_queue();
-    $cart_abandonment_emails  = it_exchange_abandoned_carts_get_abandonment_emails();
-	
+
+	$now                      = time();
+	$qualified_shoppers_queue = it_exchange_abandoned_carts_get_qualified_shoppers_queue();
+	$cart_abandonment_emails  = it_exchange_abandoned_carts_get_abandonment_emails();
+
 	IT_Exchange_Abandoned_Cart_Emails::batch();
 
-    // Loop through all of our active carts
-    foreach( $qualified_shoppers_queue as $user_id => $last_active ) {
+	// Loop through all of our active carts
+	foreach( $qualified_shoppers_queue as $user_id => $last_active ) {
 
-        $unsubscribed = get_user_meta( $user_id, '_it_exchange_unsubscribed_from_abandoned_cart_emails', true );
+		$unsubscribed = get_user_meta( $user_id, '_it_exchange_unsubscribed_from_abandoned_cart_emails', true );
 
-        if ( ! empty( $unsubscribed ) ) {
-	        continue;
-        }
+		if ( ! empty( $unsubscribed ) ) {
+			continue;
+		}
 
-        // Calculate how log it has been since this use was last active
-        $time_since_last_activity = ($now - $last_active );
+		// Calculate how log it has been since this use was last active
+		$time_since_last_activity = ($now - $last_active );
 
-        // Loop through our possible emails sorted by last email to first
-        foreach( $cart_abandonment_emails as $email_id => $props ) {
+		// Loop through our possible emails sorted by last email to first
+		foreach( $cart_abandonment_emails as $email_id => $props ) {
 
-	        // Test to see if last email was beyond the timeframe for this email
-        	if ( $time_since_last_activity < $props['time'] ) {
-        		continue;
-	        }
+			// Test to see if last email was beyond the timeframe for this email
+			if ( $time_since_last_activity < $props['time'] ) {
+				continue;
+			}
 
-            // Test to make sure the abandoned cart exists and has not received this email
-            if ( ! $abandoned_cart = it_exchange_get_active_abandoned_cart_for_user( $user_id ) ) {
-                // Grab customer's current cached cart id
-                $cached_cart       = it_exchange_get_cached_customer_cart( $user_id );
-                $cached_cart_id    = empty( $cached_cart['cart_id'][0] ) ? false : $cached_cart['cart_id'][0];
-                $cached_cart_value = it_exchange_get_cart_total( true, array( 'use_cached_customer_cart' => $user_id ) );
+			// Test to make sure the abandoned cart exists and has not received this email
+			if ( ! $abandoned_cart = it_exchange_get_active_abandoned_cart_for_user( $user_id ) ) {
+				// Grab customer's current cached cart id
+				$cached_cart       = it_exchange_get_cached_customer_cart( $user_id );
 
-                $abandoned_cart = it_exchange_add_abandoned_cart( $user_id, array(
-                    'cart_id'    => $cached_cart_id,
-                    'cart_value' => $cached_cart_value
-                ) );
-            }
+				$cached_cart_id    = empty( $cached_cart['cart_id'][0] ) ? false : $cached_cart['cart_id'][0];
+				$cached_cart_value = it_exchange_get_cart_total( true, array( 'use_cached_customer_cart' => $user_id ) );
 
-            foreach( (array) $abandoned_cart->emails_sent as $email ) {
-                if ( empty( $email['email_id'] ) ) {
-	                continue;
-                }
+				$abandoned_cart = it_exchange_add_abandoned_cart( $user_id, array(
+					'cart_id'    => $cached_cart_id,
+					'cart_value' => $cached_cart_value
+				) );
+			}
 
-                if ( $email['email_id'] == $email_id ) {
-	                continue;
-                }
-            }
+			$send_email = true;
 
-            it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $email_id );
+			foreach( (array) $abandoned_cart->emails_sent as $email ) {
+				if ( empty( $email['email_id'] ) ) {
+					continue;
+				}
 
-            break;
-        }
-    }
+				if ( $email['email_id'] == $email_id ) {
+					$send_email = false;
+					break;
+				}
+			}
+
+			if ( $send_email ) {
+				it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $email_id );
+				break;
+			}
+		}
+	}
 
 	IT_Exchange_Abandoned_Cart_Emails::batch( false );
 }
