@@ -17,3 +17,5 @@
 1.2.0 - 2015-11-04 - Lew Ayotte, Elise Alley
 	PHP7 Updates
 	Adding from headers (and other things) to abandoned cart emails
+1.2.1 - 2017-04-19 - Timothy Jacobs
+	Fix illegal offset errors and typo of 'array'.
