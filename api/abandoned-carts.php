@@ -309,6 +309,11 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 	if ( ! empty( $cached_cart['cart_id'][0] ) && $cached_cart['cart_id'][0] == $abandoned_cart->cart_id ) {
 		if ( ! empty( $cached_cart['products'] ) ) {
 			foreach( (array) $cached_cart['products'] as $product ) {
+
+				if ( empty( $product['product_id'] ) ) {
+					continue;
+				}
+
 				$product_title = it_exchange_get_product_feature( $product['product_id'], 'title' );
 				$base_price = it_exchange_get_product_feature( $product['product_id'], 'base-price' );
 				if ( ! empty( $product_title ) )
@@ -341,7 +346,7 @@ function it_exchange_abandoned_carts_send_email_for_cart( $abandoned_cart, $emai
 
 		$settings = it_exchange_get_option( 'settings_email' );
 
-		$headers = arry();
+		$headers = array();
 		if ( !empty( $settings['receipt-email-address'] ) ) {
 			$headers[] = 'From: ' . $settings['receipt-email-name'] . ' <' . $settings['receipt-email-address'] . '>';
 		}
