@@ -1,25 +1,26 @@
 <?php
 /*
- * Plugin Name: iThemes Exchange - Abandoned Carts
+ * Plugin Name: ExchangeWP - Abandoned Carts
  * Version: 1.2.1
  * Description: Tracks abandoned carts and automatically emails customers
- * Plugin URI: http://ithemes.com/exchange/abandoned-carts
- * Author: iThemes
- * Author URI: http://ithemes.com
- * iThemes Package: exchange-addon-abandoned-carts
- 
+ * Plugin URI: https://exchangewp.com/downloads/abandoned-carts/
+ * Author: ExchangeWP
+ * Author URI: https://exchangewp.com
+ * ExchangeWP Package: exchange-addon-abandoned-carts
+
  * Installation:
  * 1. Download and unzip the latest release zip file.
  * 2. If you use the WordPress plugin uploader to install this plugin skip to step 4.
  * 3. Upload the entire plugin directory to your `/wp-content/plugins/` directory.
  * 4. Activate the plugin through the 'Plugins' menu in WordPress Administration.
+ * 5. Add License key to the plugin settings page.
  *
 */
 
 /**
  * This registers our plugin as an exchange addon
  *
- * To learn how to create your own-addon, visit http://ithemes.com/codex/page/Exchange_Custom_Add-ons:_Overview
+ * To learn how to create your own-addon, visit todo: provide new link for a tutorial.
  *
  * @since 1.0.0
  *
@@ -29,8 +30,8 @@ function it_exchange_register_abandoned_carts_addon() {
 	$options = array(
 		'name'              => __( 'Abandoned Carts', 'LION' ),
 		'description'       => __( 'Tracks abandoned carts and automatically emails customers.', 'LION' ),
-		'author'            => 'iThemes',
-		'author_url'        => 'http://ithemes.com/exchange/abandoned-carts/',
+		'author'            => 'ExchangeWP',
+		'author_url'        => 'https://exchangewp.com/downloads/abandoned-carts/',
 		'icon'              => ITUtility::get_url_from_file( dirname( __FILE__ ) . '/lib/abandoned-carts50px.png' ),
 		'file'              => dirname( __FILE__ ) . '/init.php',
 		'category'          => 'admin',
@@ -59,11 +60,11 @@ add_action( 'plugins_loaded', 'it_exchange_abandoned_carts_set_textdomain' );
  * @param object $updater ithemes updater object
  * @return void
 */
-function ithemes_exchange_addon_abandoned_carts_updater_register( $updater ) { 
-	    $updater->register( 'exchange-addon-abandoned-carts', __FILE__ );
-}
-add_action( 'ithemes_updater_register', 'ithemes_exchange_addon_abandoned_carts_updater_register' );
-require( dirname( __FILE__ ) . '/lib/updater/load.php' );
+// function ithemes_exchange_addon_abandoned_carts_updater_register( $updater ) {
+// 	    $updater->register( 'exchange-addon-abandoned-carts', __FILE__ );
+// }
+// add_action( 'ithemes_updater_register', 'ithemes_exchange_addon_abandoned_carts_updater_register' );
+// require( dirname( __FILE__ ) . '/lib/updater/load.php' );
 
 /**
  * Activation hook. Runs on activation

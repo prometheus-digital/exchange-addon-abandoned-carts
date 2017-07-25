@@ -1,13 +1,13 @@
 <?php
 /**
- * This file holds the class for an iThemes Exchange Abandoned Cart
+ * This file holds the class for an ExchangeWP Abandoned Cart
  *
  * @package IT_Exchange
  * @since 1.0.0
 */
 
 /**
- * Merges a WP Post with iThemes Exchange Abandoned Cart data
+ * Merges a WP Post with ExchangeWP Abandoned Cart data
  *
  * @since 1.0.0
 */
@@ -98,7 +98,7 @@ class IT_Exchange_Abandoned_Cart {
 		$this->emails_sent = get_post_meta( $this->ID, '_it_exchange_abandoned_cart_emails_sent', true );
 		do_action( 'it_exchange_abandoned_cart_populate_post_meta_object_properties', $this->ID );
 	}
-	
+
 	/**
 	 * Class Deprecated Constructor
 	 *

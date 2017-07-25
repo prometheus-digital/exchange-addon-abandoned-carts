@@ -36,7 +36,7 @@ class IT_Exchange_Abandoned_Cart_Post_Type {
 			add_filter( 'bulk_actions-edit-it_ex_abandoned', '__return_empty_array' );
 		}
 	}
-	
+
 	/**
 	 * Class Deprecated Constructor
 	 *
@@ -59,7 +59,7 @@ class IT_Exchange_Abandoned_Cart_Post_Type {
 		);
 		$this->options = array(
 			'labels'               => $labels,
-			'description'          => __( 'An iThemes Exchange Post Type for storing all Abandoned Carts in the system', 'LION' ),
+			'description'          => __( 'An Exchange Post Type for storing all Abandoned Carts in the system', 'LION' ),
 			'public'               => false,
 			'show_ui'              => true,
 			'show_in_nav_menus'    => false,
@@ -129,13 +129,13 @@ class IT_Exchange_Abandoned_Cart_Post_Type {
 	}
 
 	/**
-	 * Provides specific hooks for when iThemes Exchange abandoned_carts are saved.
+	 * Provides specific hooks for when ExchangeWP abandoned_carts are saved.
 	 *
 	 * This method is hooked to save_post. It provides hooks for add-on developers
-	 * that will only be called when the post being saved is an iThemes Exchange abandoned_cart.
+	 * that will only be called when the post being saved is an ExchangeWP abandoned_cart.
 	 * It provides the following 4 hooks:
-	 * - it_exchange_save_abandoned_cart_unvalidated                    // Runs every time an iThemes Exchange abandoned_cart is saved.
-	 * - it_exchange_save_abandoned_cart                                // Runs every time an iThemes Exchange abandoned_cart is saved if not an autosave and if user has permission to save post
+	 * - it_exchange_save_abandoned_cart_unvalidated                    // Runs every time an ExchangeWP abandoned_cart is saved.
+	 * - it_exchange_save_abandoned_cart                                // Runs every time an ExchangeWP abandoned_cart is saved if not an autosave and if user has permission to save post
 	 *
 	 * @since 1.0.0
 	 * @return void

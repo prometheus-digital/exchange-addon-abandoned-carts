@@ -13,9 +13,12 @@
 1.0.5 - 2015-07-14 - Packaging Bot (lib/updater)
 	Enhancement: Updated link to iThemes support.
 1.1.0 - 2015-09-01 - Lew Ayotte, Elise Alley
-	Fix for scheduling column labels	
+	Fix for scheduling column labels
 1.2.0 - 2015-11-04 - Lew Ayotte, Elise Alley
 	PHP7 Updates
 	Adding from headers (and other things) to abandoned cart emails
 1.2.1 - 2017-04-19 - Timothy Jacobs
 	Fix illegal offset errors and typo of 'array'.
+1.2.2 - 2017-08-01 - AJ Morris
+	Rebrand as ExchangeWP
+	Add new licensing system

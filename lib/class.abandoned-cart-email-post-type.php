@@ -36,7 +36,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		}
 
 	}
-	
+
 	/**
 	 * Class Deprecated Constructor
 	 *
@@ -62,7 +62,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		);
 		$this->options = array(
 			'labels'               => $labels,
-			'description'          => __( 'An iThemes Exchange Post Type for storing all Abandoned Cart email templates in the system', 'LION' ),
+			'description'          => __( 'An Exchange Post Type for storing all Abandoned Cart email templates in the system', 'LION' ),
 			'public'               => false,
 			'show_ui'              => true,
 			'show_in_nav_menus'    => false,
@@ -107,13 +107,13 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 	}
 
 	/**
-	 * Provides specific hooks for when iThemes Exchange abandoned_carts are saved.
+	 * Provides specific hooks for when ExchangeWP abandoned_carts are saved.
 	 *
 	 * This method is hooked to save_post. It provides hooks for add-on developers
-	 * that will only be called when the post being saved is an iThemes Exchange abandoned_cart.
+	 * that will only be called when the post being saved is an ExchangeWP abandoned_cart.
 	 * It provides the following 4 hooks:
-	 * - it_exchange_save_abandoned_cart_email_unvalidated // Runs every time an iThemes Exchange abandoned_cart is saved.
-	 * - it_exchange_save_abandoned_cart_email             // Runs every time an iThemes Exchange abandoned_cart is saved if not an autosave and if user has permission to save post
+	 * - it_exchange_save_abandoned_cart_email_unvalidated // Runs every time an ExchangeWP abandoned_cart is saved.
+	 * - it_exchange_save_abandoned_cart_email             // Runs every time an ExchangeWP abandoned_cart is saved if not an autosave and if user has permission to save post
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -154,7 +154,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 
 		if ( ! empty( $human_readable_scheduling['int'] ) && ! empty( $human_readable_scheduling['unit'] ) ) {
 			// Set the base unit
-			switch ( $human_readable_scheduling['unit'] ) { 
+			switch ( $human_readable_scheduling['unit'] ) {
 				case 'weeks' :
 					$base = WEEK_IN_SECONDS;
 					break;
@@ -165,10 +165,10 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 					$base = HOUR_IN_SECONDS;
 					break;
 				case 'minutes' :
-				default        :   
+				default        :
 					$base = MINUTE_IN_SECONDS;
 					break;
-			}   
+			}
 			// Multiply the length times the units to get seconds for set frequency
 			$unix_scheduling = $human_readable_scheduling['int'] * $base;
 		}
@@ -346,7 +346,7 @@ class IT_Exchange_Abandoned_Cart_Email_Post_Type {
 		<select name="it-exchange-abandonded-cart-emails-scheduling[int]">
 		<?php
 		$ceiling = apply_filters( 'it_exchange_abandoned_carts_allow_minutes_in_schedule', false ) ? 59 : 23;
-		for( $i=1;$i<=$ceiling;$i++ ) { 
+		for( $i=1;$i<=$ceiling;$i++ ) {
 			?><option value="<?php echo $i; ?>" <?php selected( $i, $selected_int ); ?>><?php echo $i; ?></option><?php
 		}
 		?>
