@@ -35,6 +35,7 @@ function it_exchange_register_abandoned_carts_addon() {
 		'icon'              => ITUtility::get_url_from_file( dirname( __FILE__ ) . '/lib/abandoned-carts50px.png' ),
 		'file'              => dirname( __FILE__ ) . '/init.php',
 		'category'          => 'admin',
+		'settings-callback' => 'it_exchange_abandoned_carts_addon_settings_callback',
 	);
 	it_exchange_register_addon( 'abandoned-carts', $options );
 }

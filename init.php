@@ -19,6 +19,10 @@ include( dirname( __FILE__ ) . '/api/abandoned-carts.php' );
 include( dirname( __FILE__ ) . '/lib/class.abandoned-carts-post-type.php' );
 
 /**
+ * Settings Page
+ */
+include( dirname( __FILE__ ) . '/lib/addon-settings.php' );
+/**
  * Abandoned Carts Post Class
 */
 include( dirname( __FILE__ ) . '/lib/class.abandoned-cart.php' );
