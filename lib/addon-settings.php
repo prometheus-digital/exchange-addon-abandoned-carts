@@ -146,15 +146,15 @@ class IT_Exchange_Abandoned_Carts_Add_On {
             <h4>License Key</h4>
             <?php
                 $exchangewp_abandoned_carts_options = get_option( 'it-storage-exchange_addon_abandoned_carts' );
-                $license = $exchangewp_abandoned_carts_options['abandoned_carts_license'];
+                // $license = $exchangewp_abandoned_carts_options['abandoned_carts_license'];
                 // var_dump($license);
                 $exstatus = trim( get_option( 'exchange_abandoned_carts_license_status' ) );
                 // var_dump($exstatus);
              ?>
             <p>
               <label class="description" for="exchange_abandoned_carts_license_key"><?php _e('Enter your license key'); ?></label>
-              <input id="abandoned_carts_license" name="it-exchange-add-on-abandoned_carts-abandoned_carts_license" type="text" value="<?php #esc_attr_e( $license ); ?>" />
-              
+              <!-- <input id="abandoned_carts_license" name="it-exchange-add-on-abandoned_carts-abandoned_carts_license" type="text" value="<?php #esc_attr_e( $license ); ?>" /> -->
+              <?php $form->add_text_box( 'abandoned_carts_license' ); ?>
               <span>
                 <?php if( $exstatus !== false && $exstatus == 'valid' ) { ?>
     							<span style="color:green;"><?php _e('active'); ?></span>
