@@ -54,20 +54,6 @@ function it_exchange_abandoned_carts_set_textdomain() {
 add_action( 'plugins_loaded', 'it_exchange_abandoned_carts_set_textdomain' );
 
 /**
- * Registers Plugin with iThemes updater class
- *
- * @since 1.0.0
- *
- * @param object $updater ithemes updater object
- * @return void
-*/
-// function ithemes_exchange_addon_abandoned_carts_updater_register( $updater ) {
-// 	    $updater->register( 'exchange-addon-abandoned-carts', __FILE__ );
-// }
-// add_action( 'ithemes_updater_register', 'ithemes_exchange_addon_abandoned_carts_updater_register' );
-// require( dirname( __FILE__ ) . '/lib/updater/load.php' );
-
-/**
  * Activation hook. Runs on activation
  *
  * @since 1.0.0
@@ -90,9 +76,6 @@ function it_exchange_abandoned_carts_deactivation_hook() {
 }
 register_deactivation_hook( __FILE__, 'it_exchange_abandoned_carts_deactivation_hook' );
 
-if ( ! class_exists( 'EDD_SL_Plugin_Updater' ) )  {
-	require_once 'EDD_SL_Plugin_Updater.php';
-}
 
 function exchange_abandoned_carts_plugin_updater() {
 
