@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: ExchangeWP - Abandoned Carts
- * Version: 1.2.3
+ * Version: 0.0.1
  * Description: Tracks abandoned carts and automatically emails customers
  * Plugin URI: https://exchangewp.com/downloads/abandoned-carts/
  * Author: ExchangeWP
@@ -78,13 +78,15 @@ register_deactivation_hook( __FILE__, 'it_exchange_abandoned_carts_deactivation_
 function exchange_abandoned_carts_plugin_updater() {
 
 	$license_check = get_transient( 'exchangewp_license_check' );
+	// var_dump($license_check);
+	// die();
 
 	if ($license_check->license == 'valid' ) {
 		$license_key = it_exchange_get_option( 'exchangewp_licenses' );
 		$license = $license_key['exchange_license'];
 
 		$edd_updater = new EDD_SL_Plugin_Updater( 'https://exchangewp.com', __FILE__, array(
-				'version' 		=> '1.2.3', 				// current version number
+				'version' 		=> '0.0.1', 				// current version number
 				'license' 		=> $license, 		// license key (used get_option above to retrieve from DB)
 				'item_name' 	=> urlencode('Abandoned Carts'), 	  // name of this plugin
 				'author' 	  	=> 'ExchangeWP',    // author of this plugin
